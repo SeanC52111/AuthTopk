@@ -1,13 +1,20 @@
+/**
+ * 
+ */
 package mesh;
 
 import quickhull3d.QuickHull3D;
 
-public class Voronoi {
+/**
+ * @author chenqian
+ * This is power diagram, derived from Voronoi.java.
+ */
+public class PVoronoi {
 
 	float[][] edges;
 	MPolygon[] regions;
-
-	public Voronoi( float[][] points ){
+	
+	public PVoronoi( float[][] points ){
 
 		if( points.length < 1 ){
 			edges = new float[0][4];
@@ -20,7 +27,7 @@ public class Voronoi {
 		for(int i=0; i<points.length; i++){
 			qPoints[i*3] = points[i][0];
 			qPoints[i*3+1] = points[i][1];
-			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]); // standard half-squared eucledian distance
+			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]) - points[i][2]; // standard half-squared eucledian distance
 		}
 		// 1
 		qPoints[ qPoints.length-9 ] = -8000D;
@@ -50,18 +57,21 @@ public class Voronoi {
 
 			double x0 = qPoints[faces[i][0]*3+0];
 			double y0 = qPoints[faces[i][0]*3+1];
+			double z0 = qPoints[faces[i][0]*3+2];
 			double x1 = qPoints[faces[i][1]*3+0];
 			double y1 = qPoints[faces[i][1]*3+1];
+			double z1 = qPoints[faces[i][1]*3+2];
 			double x2 = qPoints[faces[i][2]*3+0];
 			double y2 = qPoints[faces[i][2]*3+1];
-
+			double z2 = qPoints[faces[i][2]*3+2];
+			
 			double v1x = 2 * (x1-x0);
 			double v1y = 2 * (y1-y0);
-			double v1z = x0*x0 - x1*x1 + y0*y0 - y1*y1;
+			double v1z = z1 - z0;
 
 			double v2x = 2 * (x2-x0);
 			double v2y = 2 * (y2-y0);
-			double v2z = x0*x0 - x2*x2 + y0*y0 - y2*y2;
+			double v2z = z2 - z0;
 
 			double tmpx = v1y * v2z - v1z * v2y;
 			double tmpy = v1z * v2x - v1x * v2z;
@@ -147,9 +157,8 @@ public class Voronoi {
 			}
 
 		}
-
 	}
-
+	
 	public MPolygon[] getRegions(){
 		return regions;
 	}
@@ -174,6 +183,21 @@ public class Voronoi {
 			}
 		}
 		return false;
+	}
+
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		//test PVoronoi
+		float [][] points = {{(float) -2.5,0,1}, {(float) 2.5,0,31}};
+		PVoronoi pvd = new PVoronoi(points);
+		float[][] edges = pvd.getEdges();
+		for(int i = 0; i < edges.length; i++){
+			System.out.println(edges[i][0] + ", " + edges[i][1]);
+		}
 	}
 
 }

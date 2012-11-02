@@ -1,16 +1,21 @@
+/**
+ * 
+ */
 package mesh;
 
 import quickhull3d.QuickHull3D;
 
-public class Delaunay {
-
+/**
+ * @author chenqian
+ * This is Power Delaunay, derived from Delaynay.java.
+ */
+public class PDelaunay {
 	float[][] edges;
 	LinkedArray mesh;
 	int[][] links;
 	int linkCount;
-
-	public Delaunay( float[][] points ){
-
+	
+	public PDelaunay(float points[][]){
 		if( points.length < 1 ){
 			edges = new float[0][4];
 			mesh = new LinkedArray(0);
@@ -24,7 +29,7 @@ public class Delaunay {
 		for(int i=0; i<points.length; i++){
 			qPoints[i*3] = points[i][0];
 			qPoints[i*3+1] = points[i][1];
-			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]); // standard half-squared eucledian distance
+			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]) - points[i][2]; // standard half-squared eucledian distance
 		}
 		// 1
 		qPoints[ qPoints.length-9 ] = -2000;
@@ -73,9 +78,8 @@ public class Delaunay {
 			edges[i][2] = points[links[i][1] - 1][0];
 			edges[i][3] = points[links[i][1] - 1][1];
 		}
-
 	}
-
+	
 	public float[][] getEdges(){
 		return edges;
 	}
@@ -90,6 +94,17 @@ public class Delaunay {
 
 	public int edgeCount(){
 		return linkCount;
+	}
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		//for test
+		float [][] points = {{(float) -2.5,0,1}, {(float) 2.5,0,31}};
+		PDelaunay pd = new PDelaunay(points);
+		System.out.println("0," + (pd.getLinked(1)[0] - 1));
 	}
 
 }
