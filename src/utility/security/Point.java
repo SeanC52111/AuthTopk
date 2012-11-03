@@ -12,8 +12,8 @@ import java.math.BigInteger;
 import java.util.BitSet;
 
 public class Point {
-	public long x, y;
-	public BigInteger g_p_x2 = null, g_p_y2 = null, g_2p_x, g_2p_y;
+	public long x, y, w; // x, y and weight
+	public BigInteger g_p_x2 = null, g_p_y2 = null, g_2p_x, g_2p_y, g_p_w;
 	public BigInteger g_a, g_0;
 	public static SeedsGenerater seeds = new SeedsGenerater(true);
 	public static Paillier pailliar = new Paillier(true);
@@ -22,35 +22,42 @@ public class Point {
 	public Point(){
 		x = 0; 
 		y = 0;
+		w = 0;
 	}
 	
-	public Point(long _x, long _y){
+	public Point(long _x, long _y, long _w){
 		x = _x;
 		y = _y;
+		w = _w;
 	}
 	public Point(long[] c){
 		x = c[0];
 		y = c[1];
+		w = c[2];
 	}
 	
 	public Point(int[] c){
 		x = c[0];
 		y = c[1];
+		w = c[2];
 	}
 	
 	public Point(Point _p){
 		this.x = _p.x;
 		this.y = _p.y;
+		this.w = _p.w;
 	}
 	
 	public Point(Point _p, boolean isLoad){
 		this.x = _p.x;
 		this.y = _p.y;
+		this.w = _p.w;
 		if(isLoad){
 			this.g_2p_x = _p.g_2p_x;
 			this.g_2p_y = _p.g_2p_y;
 			this.g_p_x2 = _p.g_p_x2;
 			this.g_p_y2 = _p.g_p_y2;
+			this.g_p_w = _p.g_p_w;
 		}
 	}
 	
@@ -59,6 +66,7 @@ public class Point {
 		this.g_2p_x = p.g_2p_x;
 		this.g_p_x2 = p.g_p_x2;
 		this.g_a = p.g_a;
+		this.g_p_w = p.g_p_w;
 	}
 	
 	public void setYSide(Point p){
@@ -66,8 +74,14 @@ public class Point {
 		this.g_2p_y = p.g_2p_y;
 		this.g_p_y2 = p.g_p_y2;
 		this.g_a = p.g_a;
+		this.g_p_w = p.g_p_w;
 	}
 	
+	
+	/**
+	 * This didn't consider w.,
+	 * 
+	 * */
 	public Point(Point p1, Point p2){
 		this.x = p1.x;
 		this.y = p2.y;	
@@ -79,12 +93,13 @@ public class Point {
 	}
 	
 	public Point doublePoint(){
-		return new Point(x * 2, y * 2);
+		return new Point(x * 2, y * 2, w * 2);
 	}
 	
 	public void Add(Point q){
 		x += q.x;
 		y += q.y;
+		w += q.w;
 	}
 	
 	public static long Areax2(Point L, Point H, Point Q){
@@ -156,11 +171,13 @@ public class Point {
 		left = left.multiply(a.g_2p_y.modPow(b_q_y, pailliar.nsquare)).mod(pailliar.nsquare);
 		left = left.multiply(b.g_p_x2.multiply(b.g_p_y2).mod(pailliar.nsquare)).mod(pailliar.nsquare);
 		left = left.multiply(b.g_a.modPow(b_q_x.add(b_q_y).subtract(BigInteger.ONE), pailliar.nsquare)).mod(pailliar.nsquare);
+		left = left.multiply(a.g_p_w).mod(pailliar.nsquare);
 		BigInteger right = b.g_2p_x.modPow(b_q_x, pailliar.nsquare);
 		right = right.multiply(b.g_2p_y.modPow(b_q_y, pailliar.nsquare)).mod(pailliar.nsquare);
 		right = right.multiply(a.g_p_x2.multiply(a.g_p_y2).mod(pailliar.nsquare)).mod(pailliar.nsquare);
 		right = right.multiply(a.g_a.modPow(b_q_x.add(b_q_y).subtract(BigInteger.ONE), pailliar.nsquare)).mod(pailliar.nsquare);
 		right = right.multiply(delta).mod(pailliar.nsquare);
+		right = right.multiply(b.g_p_w).mod(pailliar.nsquare);
 		if(left.equals(right))return true;
 		return false;
 	}
@@ -177,6 +194,7 @@ public class Point {
 		g_p_y2 = pailliar.Encryption(b_y.multiply(b_y));
 		g_2p_x = pailliar.Encryption(b_x.multiply(BigInteger.valueOf(2)));
 		g_2p_y = pailliar.Encryption(b_y.multiply(BigInteger.valueOf(2)));
+		g_p_w = pailliar.Encryption(BigInteger.valueOf(w));
 	}
 	
 	
@@ -189,6 +207,7 @@ public class Point {
 			g_2p_x = DataIO.readBigInteger(dis);
 			g_2p_y = DataIO.readBigInteger(dis);
 			g_a = DataIO.readBigInteger(dis);
+			g_p_w = DataIO.readBigInteger(dis);
 			//g_0 = DataIO.readBigInteger(dis);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -205,6 +224,7 @@ public class Point {
 			DataIO.writeBigInteger(dos, g_2p_x);
 			DataIO.writeBigInteger(dos, g_2p_y);
 			DataIO.writeBigInteger(dos, g_a);
+			DataIO.writeBigInteger(dos, g_p_w);
 			//DataIO.writeBigInteger(dos, g_0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -213,7 +233,7 @@ public class Point {
 	}
 	
 	public String getDigest(){
-		BigInteger[] tmp = {g_p_x2, g_p_y2, g_2p_x, g_2p_y, g_a};
+		BigInteger[] tmp = {g_p_x2, g_p_y2, g_2p_x, g_2p_y, g_a, g_p_w};
 		try {
 			return SecurityUtility.computeHashValue(tmp);
 		} catch (UnsupportedEncodingException e) {
@@ -225,7 +245,7 @@ public class Point {
 	
 	public String getDigestX(){
 		try {
-			return SecurityUtility.computeHashValue(new BigInteger[]{g_p_x2, g_2p_x, g_a});
+			return SecurityUtility.computeHashValue(new BigInteger[]{g_p_x2, g_2p_x, g_a, g_p_w});
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -235,7 +255,7 @@ public class Point {
 	
 	public String getDigestY(){
 		try {
-			return SecurityUtility.computeHashValue(new BigInteger[]{g_p_y2, g_2p_y, g_a});
+			return SecurityUtility.computeHashValue(new BigInteger[]{g_p_y2, g_2p_y, g_a, g_p_w});
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,6 +278,7 @@ public class Point {
 		ans += g_p_x2.toByteArray().length;
 		ans += g_p_y2.toByteArray().length;
 		ans += g_a.toByteArray().length;
+		ans += g_p_w.toByteArray().length;
 		return ans;
 	}
 	
@@ -267,13 +288,13 @@ public class Point {
 	}
 	
 	public static void main(String args[]){
-		Point L = new Point(1, 0), H = new Point(0, 1), Q = new Point(1, 1);
+		Point L = new Point(1, 0, 0), H = new Point(0, 1, 0), Q = new Point(1, 1, 0);
 		System.out.println("areax2 : " + Point.Areax2(L, H, Q));
 		
 		/**
 		 * test for paillier point based function
 		 * */
-		Point a = new Point(100, 0), b = new Point(0, 100), q = new Point(0, 0);//equal
+		Point a = new Point(100, 0, 0), b = new Point(0, 100, 0), q = new Point(0, 0, 0);//equal
 		RSA rsa = new RSA();
 		a.buildByPaillier();
 		b.buildByPaillier();
@@ -284,7 +305,7 @@ public class Point {
 			System.err.println("Fail!");
 		}
 		
-		q = new Point(100, 100);
+		q = new Point(100, 100, 0);
 		rsa_delta = buildDelta(a, b, q.x, q.y);//for server
 		//System.out.println(rsa.decrypt(rsa_delta));
 		if(verifyByClient(a, b, q, rsa.decrypt(rsa_delta))){
