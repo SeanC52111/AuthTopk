@@ -26,9 +26,9 @@ public class DistanceCompare implements IVo{
 		init();
 	}
 	
-	public DistanceCompare(int x1, int y1, int x2, int y2){
-		pL = new Point(x1, y1);
-		pH = new Point(x2, y2);
+	public DistanceCompare(int x1, int y1, int w1, int x2, int y2, int w2){
+		pL = new Point(x1, y1, w1);
+		pH = new Point(x2, y2, w2);
 		init();
 	}
 	
@@ -53,7 +53,7 @@ public class DistanceCompare implements IVo{
 	
 	public boolean ClientVerify(int q_x, int q_y){
 		//long start = System.currentTimeMillis();
-		if(Point.verifyByClient(pL, pH, new Point(q_x, q_y), rsa.decrypt(rsa_delta))){
+		if(Point.verifyByClient(pL, pH, new Point(q_x, q_y, 0), rsa.decrypt(rsa_delta))){
 			//System.out.println("Success!");
 			return true;
 		}else{
@@ -92,18 +92,44 @@ public class DistanceCompare implements IVo{
 		/**
 		 * example, Dist(pL, q) <= Dist(pH, q)
 		 * */
-		Point q = new Point(1, 1);
+		Point q = new Point(1, 1, 0);
+		Point p1 = new Point(31468, 34963, 0);
+		Point p2 = new Point(31560, 34801, 0);
 //		DistanceCompare dc1 = new DistanceCompare(31468, 34963, 31560, 34801);
-		DistanceCompare dc1 = new DistanceCompare(31468, 34963, 31560, 34801);
-		System.out.println(Point.Distance2(1, 1, 31468, 34963));
-		System.out.println(Point.Distance2(1, 1, 31560, 34801));
+//		DistanceCompare dc1 = new DistanceCompare(31468, 34963, 0, 31560, 34801, 0);
+		DistanceCompare dc1 = new DistanceCompare(p1, p2);
+		System.out.println(Point.Distance2(q.getX(), q.getY(), 31468, 34963));
+		System.out.println(Point.Distance2(q.getX(), q.getY(), 31560, 34801));
+		
+		/**
+		 * fail
+		 * */
+		dc1.GenerateVeryfyPart(q);
+		if(dc1.ClientVerify(q)){ 
+			System.out.println("pass!");
+		}else{
+			System.err.println("fail!");
+		}
+		
+		/**
+		 * pass
+		 * */
+		dc1 = new DistanceCompare(p2, p1);
 		dc1.GenerateVeryfyPart(q);
 		if(dc1.ClientVerify(q)){
 			System.out.println("pass!");
 		}else{
 			System.err.println("fail!");
 		}
-		q = new Point(99, 1);
+		
+		/**
+		 * 
+		 * pass
+		 * */
+		p2 = new Point(3, 1, 4);
+		p1 = new Point(1, 2, 6);
+		q = new Point(4, 4, 0);
+		dc1 = new DistanceCompare(p1, p2);
 		dc1.GenerateVeryfyPart(q);
 		if(dc1.ClientVerify(q)){
 			System.out.println("pass!");

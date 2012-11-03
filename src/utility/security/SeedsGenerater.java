@@ -117,7 +117,7 @@ public class SeedsGenerater {
 	}
 	
 	public BigInteger Decompose2(BigInteger val){
-		//System.out.println(val);
+		System.out.println(val);
 		BigInteger ans = BigIntegerUtility.ONE;
 		for(int i = 0 ; i < seeds.length - 1; i ++){
 			//if(val.compareTo(seeds[i]) >= 0){

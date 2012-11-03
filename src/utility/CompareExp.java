@@ -32,8 +32,8 @@ public class CompareExp {
 		 * */
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end, times = 1;
-		Point q = new Point(100, 10000);
-		Point p1 = new Point(0, 1000000), p2 = new Point(1000000, 0);
+		Point q = new Point(100, 10000, 0);
+		Point p1 = new Point(0, 1000000, 0), p2 = new Point(1000000, 0, 0);
 		start = bean.getCurrentThreadCpuTime();
 		DistanceCompare dc = new DistanceCompare(p1, p2);
 		end = bean.getCurrentThreadCpuTime();

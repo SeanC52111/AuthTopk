@@ -133,9 +133,10 @@ public class Point {
 	 * distance is signed
 	 * */
 	public static BigInteger buildDelta(Point pL, Point pH, long q_x, long q_y){
-		BigInteger dis1 = new BigInteger(new Long(Point.Distance2(pH.x, pH.y, q_x, q_y)).toString());
-		BigInteger dis2 = new BigInteger(new Long(Point.Distance2(pL.x, pL.y, q_x, q_y)).toString());
+		BigInteger dis1 = new BigInteger(new Long(Point.Distance2(pH.x, pH.y, q_x, q_y) + pH.w).toString());
+		BigInteger dis2 = new BigInteger(new Long(Point.Distance2(pL.x, pL.y, q_x, q_y) + pL.w).toString());
 		//return seeds.Decompose2(dis1.subtract(dis2).multiply(a));
+//		System.out.println(dis1 + " " + dis2);
 		return seeds.Decompose2(dis1.subtract(dis2));
 	}
 	
@@ -285,6 +286,30 @@ public class Point {
 	public void print(){
 		System.out.print("x = " + x + ", y = " + y);
 		System.out.println();
+	}
+	
+	public long getX(){
+		return this.x;
+	}
+	
+	public long getY(){
+		return this.y;
+	}
+	
+	public long getW(){
+		return this.w;
+	}
+	
+	public void setX(long x){
+		this.x = x;
+	}
+	
+	public void setY(long y){
+		this.y = y;
+	}
+	
+	public void setW(long w){
+		this.w = w;
 	}
 	
 	public static void main(String args[]){
