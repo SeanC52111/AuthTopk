@@ -105,6 +105,7 @@ public class PDelaunay {
 		float [][] points = {{(float) -2.5,0,1}, {(float) 2.5,0,31}};
 		PDelaunay pd = new PDelaunay(points);
 		System.out.println("0," + (pd.getLinked(1)[0] - 1));
+		
 	}
 
 }

@@ -23,25 +23,52 @@ public class PVoronoi {
 		}
 
 		// build points array for qhull
-		double qPoints[] = new double[ points.length*3 + 9 ];
+		double qPoints[] = new double[ points.length*3 + 9];
 		for(int i=0; i<points.length; i++){
 			qPoints[i*3] = points[i][0];
 			qPoints[i*3+1] = points[i][1];
 			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]) - points[i][2]; // standard half-squared eucledian distance
 		}
 		// 1
-		qPoints[ qPoints.length-9 ] = -8000D;
+		qPoints[ qPoints.length-9 ] = -20D;
 		qPoints[ qPoints.length-8 ] = 0D;
-		qPoints[ qPoints.length-7 ] = -64000000D;
-		// 2
-		qPoints[ qPoints.length-6 ] = 8000D;
-		qPoints[ qPoints.length-5 ] = 8000D;
-		qPoints[ qPoints.length-4 ] = -128000000D;
-		// 3
-		qPoints[ qPoints.length-3 ] = 8000D;
-		qPoints[ qPoints.length-2 ] = -8000D;
-		qPoints[ qPoints.length-1 ] = -128000000D;
+		qPoints[ qPoints.length-7 ] =  -(qPoints[ qPoints.length-9 ] * qPoints[ qPoints.length-9 ] + 
+				qPoints[ qPoints.length-8 ] * qPoints[ qPoints.length-8 ]);
 
+		// 2
+		qPoints[ qPoints.length-6 ] = 20D;
+		qPoints[ qPoints.length-5 ] = 20D;
+		qPoints[ qPoints.length-4 ] =  -(qPoints[ qPoints.length-6 ] * qPoints[ qPoints.length-6 ] + 
+				qPoints[ qPoints.length-5 ] * qPoints[ qPoints.length-5 ]);
+
+		// 3
+		qPoints[ qPoints.length-3 ] = 20D;
+		qPoints[ qPoints.length-2 ] = -20D;
+		qPoints[ qPoints.length-1 ] =  -(qPoints[ qPoints.length-3 ] * qPoints[ qPoints.length-3 ] + 
+				qPoints[ qPoints.length-2 ] * qPoints[ qPoints.length-2 ]);
+
+
+//		//0
+//		qPoints[ qPoints.length-12 ] = -8000D;
+//		qPoints[ qPoints.length-11 ] = -8000D;
+//		qPoints[ qPoints.length-10 ] = -(qPoints[ qPoints.length-12 ] * qPoints[ qPoints.length-12 ] + 
+//				qPoints[ qPoints.length-11 ] * qPoints[ qPoints.length-11 ]);
+//		//1
+//		qPoints[ qPoints.length-9 ] = 8000D;
+//		qPoints[ qPoints.length-8 ] = -8000D;
+//		qPoints[ qPoints.length-7 ] = -(qPoints[ qPoints.length-9 ] * qPoints[ qPoints.length-9 ] + 
+//				qPoints[ qPoints.length-8 ] * qPoints[ qPoints.length-8 ]);
+//		// 2
+//		qPoints[ qPoints.length-6 ] = -8000D;
+//		qPoints[ qPoints.length-5 ] = 8000D;
+//		qPoints[ qPoints.length-4 ] = -(qPoints[ qPoints.length-6 ] * qPoints[ qPoints.length-6 ] + 
+//				qPoints[ qPoints.length-5 ] * qPoints[ qPoints.length-5 ]);;
+//		// 3
+//		qPoints[ qPoints.length-3 ] = 8000D;
+//		qPoints[ qPoints.length-2 ] = 8000D;
+//		qPoints[ qPoints.length-1 ] = -(qPoints[ qPoints.length-3 ] * qPoints[ qPoints.length-3 ] + 
+//				qPoints[ qPoints.length-2 ] * qPoints[ qPoints.length-2 ]);;
+//		
 		// prepare quickhull
 		QuickHull3D quickHull = new QuickHull3D(qPoints);
 		int[][] faces = quickHull.getFaces(QuickHull3D.POINT_RELATIVE + QuickHull3D.CLOCKWISE);
@@ -128,6 +155,11 @@ public class PVoronoi {
 		// calculate the region for each point
 		regions = new MPolygon[points.length];
 		for(int i=0; i<points.length; i++){
+			if(pointBuckets[i].length == 0){
+				regions[i] = new MPolygon(0);
+				continue; //some points may be dominated, attention!
+			}
+			
 			IntArray faceOrder = new IntArray(pointBuckets[i].length);
 
 			// add coords of the region in the order they touch, starting with the convenient first
@@ -184,13 +216,13 @@ public class PVoronoi {
 		}
 		return false;
 	}
-
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		
 		//test PVoronoi
 		float [][] points = {{(float) -2.5,0,1}, {(float) 2.5,0,31}};
 		PVoronoi pvd = new PVoronoi(points);
@@ -198,6 +230,6 @@ public class PVoronoi {
 		for(int i = 0; i < edges.length; i++){
 			System.out.println(edges[i][0] + ", " + edges[i][1]);
 		}
+//
 	}
-
 }

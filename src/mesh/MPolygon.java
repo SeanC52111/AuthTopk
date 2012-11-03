@@ -3,7 +3,7 @@ package mesh;
 public class MPolygon {
 
 	float[][] coords;
-	int count;
+	int count = 0;
 	
 	public MPolygon(){
 		this(0);
@@ -25,6 +25,11 @@ public class MPolygon {
 
 	public float[][] getCoords(){
 		return coords;
+	}
+	
+	public float[] getCoords(int i){
+		if(i >= count)System.err.println("out of range!");
+		return coords[i];
 	}
 
 }
