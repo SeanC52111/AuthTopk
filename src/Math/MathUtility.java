@@ -11,6 +11,15 @@ public class MathUtility {
 
 public static double eps = 1e-8;
 	
+	/**
+	 * 
+	 * get square
+	 * 
+	 * */
+
+	public static double Square(double x){
+		return x * x;
+	}
 
 	/**
 	 * D(x) < 0, x < 0
@@ -27,7 +36,7 @@ public static double eps = 1e-8;
 	 * Determinant
 	 * */
 	public static double Det(MathPoint a, MathPoint b, MathPoint c){
-		return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (c.getX() - a.getX()) * (b.getY() - a.getY());
+		return -(b.getX() - a.getX()) * (c.getY() - a.getY()) + (c.getX() - a.getX()) * (b.getY() - a.getY());
 	}
 	
 	

@@ -93,7 +93,7 @@ public class Point {
 	}
 	
 	public Point doublePoint(){
-		return new Point(x * 2, y * 2, w * 2);
+		return new Point(x * 2, y * 2, w * 4); // we need square at last, so we multiply 4 for w.
 	}
 	
 	public void Add(Point q){

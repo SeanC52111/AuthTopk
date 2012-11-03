@@ -571,12 +571,18 @@ public class Gfunction {
 		}
 	}
 	
+	
+	/**
+	 * It seems if isL = true, x <= val can pass; if isR = true, x >= val can pass.
+	 * 
+	 * 
+	 * */
 	public static void main(String[] args) throws Exception{
 		
 		/**
 		 * test for g function
 		 * */
-		long val = 0, x = 500000, times = 1000;
+		long val = 0, x = 1, times = 1000;
 		long start = System.currentTimeMillis(), cputime;
 		Gfunction gf = new Gfunction(val, 16);
 		String[]  ServerReturned = null;
@@ -595,7 +601,7 @@ public class Gfunction {
 				break;
 			}
 		}
-		x = -100;
+		x = -1;
 		gf = new Gfunction(val, 16);
 		ServerReturned = gf.GenerateVeryfyPart(x, true);
 		start = System.currentTimeMillis();

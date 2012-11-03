@@ -65,7 +65,7 @@ public class CompareExp {
 		System.out.println("DO Time consume:\t" + (end - start) / 1000000.0 + " ms");
 		start = bean.getCurrentThreadCpuTime();
 		for(int i = 0; i < times; i++){
-			l.GenerateVeryfyPart(q);
+			l.GenerateVeryfyPart(q, true);
 		}
 		end = bean.getCurrentThreadCpuTime();
 		System.out.println("SP Time consume:\t" + (end - start) / 1000000.0 + " ms");

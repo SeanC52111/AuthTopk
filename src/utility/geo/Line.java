@@ -14,6 +14,9 @@ import java.math.BigInteger;
 
 import javax.xml.crypto.Data;
 
+import Math.MathPoint;
+import Math.MathUtility;
+
 import utility.security.DataIO;
 import utility.security.Gfunction;
 import utility.security.IVo;
@@ -24,7 +27,7 @@ import utility.security.SeedsGenerater;
 
 public class Line implements IVo{
 	Point pL, pH;
-	Point o_pL, o_pH; 
+	MathPoint o_pL, o_pH; 
 	Point farL_pL, farL_pH;
 	Point farR_pL, farR_pH;
 	public static Paillier paillier = new Paillier(true);
@@ -40,9 +43,9 @@ public class Line implements IVo{
 		pH = new Point();
 	}
 	
-	public Line(long x1, long y1, long x2, long y2){
-		pL = new Point(x1, y1).doublePoint();
-		pH = new Point(x2, y2).doublePoint();
+	public Line(long x1, long y1, long w1, long x2, long y2, long w2){
+		pL = new Point(x1, y1, w1).doublePoint();
+		pH = new Point(x2, y2, w2).doublePoint();
 		init();
 	}
 	
@@ -66,21 +69,37 @@ public class Line implements IVo{
 	public void init(){
 //		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 //		long start, end;
-		o_pL = new Point((pL.x + pH.x) / 2, (pL.y + pH.y) / 2);
-		Point vertical = new Point(pH.y - pL.y, pL.x - pH.x);
-		o_pH = new Point(o_pL);
-		o_pH.Add(vertical);
+//		o_pL = new Point((pL.x + pH.x) / 2, (pL.y + pH.y) / 2, 0);
+//		Point vertical = new Point(pH.y - pL.y, pL.x - pH.x, 0);
+//		o_pH = new Point(o_pL);
+//		o_pH.Add(vertical);
+		
+		/**
+		 * x_{i,j} = (|x_j|^2 - |x_i|^2 + w_j - w_i) / (2|x_i - x_j|^2) (x_j - x_i),
+		 * where x_i, x_j are points
+		 * 
+		 * */
+		double k = ((MathUtility.Square(pH.getX()) + MathUtility.Square(pH.getY()) 
+				- MathUtility.Square(pL.getX()) - MathUtility.Square(pL.getY())
+				+ pH.getW() - pL.getW()) / 
+				(2 * Point.Distance2(pH, pL)));
+		o_pL = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
+		MathPoint vertical_mp = new MathPoint(pH.y - pL.y, pL.x - pH.x);
+		Point vertical = new Point(pH.y - pL.y, pL.x - pH.x, 0);
+		o_pH = new MathPoint(MathPoint.add(o_pL, vertical_mp));
+		
 		Point[] far_pL = new Point[4], far_pH = new Point[4];
-		long[] area = new long[4];
-		far_pL[0] = new Point(-(1 << 20), -(1 << 20));
-		far_pL[1] = new Point((1 << 20) - 1, -(1 << 20));
-		far_pL[2] = new Point(-(1 << 20), (1 << 20) - 1);
-		far_pL[3] = new Point((1 << 20) - 1, (1 << 20) - 1);
-		long min = (long)1 << 60, max = -(long) 1 << 60;
+		double[] area = new double[4];
+		far_pL[0] = new Point(-(1 << 20), -(1 << 20), 0);
+		far_pL[1] = new Point((1 << 20) - 1, -(1 << 20), 0);
+		far_pL[2] = new Point(-(1 << 20), (1 << 20) - 1, 0);
+		far_pL[3] = new Point((1 << 20) - 1, (1 << 20) - 1, 0);
+		double min = 1e60, max = -1e60;
 		for(int i = 0; i < 4; i++ ){
 			far_pH[i] = new Point(far_pL[i]);
 			far_pH[i].Add(vertical);
-			area[i] = Point.Areax2(far_pL[i], far_pH[i], o_pL);
+			area[i] = MathUtility.Det(o_pL,new MathPoint(far_pL[i].getX(), far_pL[i].getY()), 
+					new MathPoint(far_pH[i].getX(), far_pH[i].getY()));
 			if(min > area[i]){
 				farL_pL = far_pL[i];
 				farL_pH = far_pH[i];
@@ -92,15 +111,9 @@ public class Line implements IVo{
 				max = area[i];
 			}
 		}
-//		System.out.println(min + "\t" + max);
-//		start = bean.getCurrentThreadCpuTime();
-		gf = new Gfunction(0, 16, min, max);
-		//end = bean.getCurrentThreadCpuTime();
-		//System.out.println("init g function time consume:\t" + (end - start) / 1000000.0 + " ms");
-		//start = bean.getCurrentThreadCpuTime();
+		System.out.println(min + " " + ((long)(min)));
+		gf = new Gfunction(0, 16, (long)min, (long)max);
 		init_paillier();
-		//end = bean.getCurrentThreadCpuTime();
-		//System.out.println("init paillier time consume:\t" + (end - start) / 1000000.0 + " ms");
 	}
 	
 	void init_paillier(){
@@ -134,25 +147,47 @@ public class Line implements IVo{
 		g_R_x2y1 = paillier.Encryption(x2.multiply(y1));
 	}
 	
-	public void GenerateVeryfyPart(Point Q){
+	
+	/**
+	 *  To judge side first.
+	 * */
+	public void GenerateVeryfyPart(Point Q, boolean isL){
 		Q = Q.doublePoint();
 		if(o_pL == null || o_pH == null){
-			o_pL = new Point((pL.x + pH.x) / 2, (pL.y + pH.y) / 2);
-			Point vertical = new Point(pH.y - pL.y, pL.x - pH.x);
-			o_pH = new Point(o_pL);
-			o_pH.Add(vertical);
+			double k = ((MathUtility.Square(pH.getX()) + MathUtility.Square(pH.getY()) 
+					- MathUtility.Square(pL.getX()) - MathUtility.Square(pL.getY())
+					+ pH.getW() - pL.getW()) / 
+					(2 * Point.Distance2(pH, pL)));
+			MathPoint ol = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
+			MathPoint vertical = new MathPoint(pH.y - pL.y, pL.x - pH.x);
+			MathPoint oh = new MathPoint(MathPoint.add(ol, vertical));
 		}
-		long area = Point.Areax2(o_pL, o_pH, Q);
-		if(area < 0){
+		
+		MathPoint oq = new MathPoint(Q.getX(), Q.getY());
+		//long area = Point.Areax2(o_pL, o_pH, Q);
+		double area = MathUtility.Det(oq, o_pL, o_pH);
+		if(MathUtility.D(area) <= 0){
+			if(MathUtility.D(area) != 0){
+				if(isL != false){
+					System.err.println("Error side!");
+					return;
+				}
+			}
 			long area2 = Point.Areax2(farR_pL, farR_pH, Q);
 			areaRep = seeds.getRepresentation(area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart(- area, false);
+			ServerReturned = gf.GenerateVeryfyPart((long)(- area), false);
 		}else{
+			if(MathUtility.D(area) != 0){
+				if(isL != true){
+					System.err.println("Error side!");
+					return;
+				}
+			}
 			long area2 = Point.Areax2(farL_pL, farL_pH, Q);
 			areaRep = seeds.getRepresentation(- area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart(- area, true);			
+			ServerReturned = gf.GenerateVeryfyPart((long)(- area), true);			
 		}
 	}
 		
@@ -243,12 +278,12 @@ public class Line implements IVo{
 	public void readFromFile(DataInputStream dis){
 		try {
 			readFromFileOfPaillier(dis);
-			pL = new Point(dis.readLong(), dis.readLong());
-			pH = new Point(dis.readLong(), dis.readLong());
-			farL_pL = new Point(dis.readLong(), dis.readLong());
-			farL_pH = new Point(dis.readLong(), dis.readLong());
-			farR_pL = new Point(dis.readLong(), dis.readLong());
-			farR_pH = new Point(dis.readLong(), dis.readLong());
+			pL = new Point(dis.readLong(), dis.readLong(), 0);
+			pH = new Point(dis.readLong(), dis.readLong(), 0);
+			farL_pL = new Point(dis.readLong(), dis.readLong(), 0);
+			farL_pH = new Point(dis.readLong(), dis.readLong(), 0);
+			farR_pL = new Point(dis.readLong(), dis.readLong(), 0);
+			farR_pH = new Point(dis.readLong(), dis.readLong(), 0);
 			gf = new Gfunction();
 			gf.readFromFile(dis);
 		} catch (IOException e) {
@@ -258,7 +293,7 @@ public class Line implements IVo{
 	}
 
 	public boolean ClientVerify(int q_x, int q_y){
-		return ClientVerify(new Point(q_x, q_y));
+		return ClientVerify(new Point(q_x, q_y, 0));
 	}
 
 	public boolean ClientVerify(Point q) {
@@ -363,6 +398,12 @@ public class Line implements IVo{
 		return ans;
 	}
 	
+	
+	/**
+	 * if q is located to left side, set 'whichside' to false;
+	 * if q is located to right side, set 'whichside' to true;
+	 * 
+	 * */
 	public static void main(String[] args){
 		
 		/**
@@ -371,12 +412,12 @@ public class Line implements IVo{
 		int times = 1;
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end;	
-		Line l = new Line(new int[]{ 0, 100}, new int[]{100, 0});
+		Line l = new Line(new int[]{ 0, 100, 0}, new int[]{100, 0, 0});
 		end = bean.getCurrentThreadCpuTime();
 		System.out.println("For init:\t" + (end -start) / 1000000.0 + " ms");
-		Point Q = new Point (1, 1);
+		Point Q = new Point (1, 1, 0);
 		//System.out.println("area: " + Point.Areax2(l.o_pL, l.o_pH, Q.doublePoint()));
-		l.GenerateVeryfyPart(Q);
+		l.GenerateVeryfyPart(Q, false);
 
 		for(int i = 0; i < times; i++){
 			if(l.ClientVerify(Q)){
@@ -385,9 +426,10 @@ public class Line implements IVo{
 				System.err.println("fail verification");
 			}
 		}
-		Q = new Point (600, 60000000);
+//		System.err.println("===========================");
+		Q = new Point (0, 1, 0);
 		//System.out.println("area: " + Point.Areax2(l.o_pL, l.o_pH, Q.doublePoint()));
-		l.GenerateVeryfyPart(Q);
+		l.GenerateVeryfyPart(Q, true);
 		start = System.currentTimeMillis();	
 		for(int i = 0; i < times; i++){
 			if(l.ClientVerify(Q)){
