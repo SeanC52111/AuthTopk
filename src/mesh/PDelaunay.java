@@ -32,19 +32,19 @@ public class PDelaunay {
 			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]) - points[i][2]; // standard half-squared eucledian distance
 		}
 		// 1
-		qPoints[ qPoints.length-9 ] = -2000000D;
+		qPoints[ qPoints.length-9 ] = -10D;
 		qPoints[ qPoints.length-8 ] = 0;
 		qPoints[ qPoints.length-7 ] =  -(qPoints[ qPoints.length-9 ] * qPoints[ qPoints.length-9 ] + 
 				qPoints[ qPoints.length-8 ] * qPoints[ qPoints.length-8 ]);
 
 		// 2
-		qPoints[ qPoints.length-6 ] = 2000000D;
-		qPoints[ qPoints.length-5 ] = 2000000D;
+		qPoints[ qPoints.length-6 ] = 10D;
+		qPoints[ qPoints.length-5 ] = 10D;
 		qPoints[ qPoints.length-4 ] =  -(qPoints[ qPoints.length-6 ] * qPoints[ qPoints.length-6 ] + 
 				qPoints[ qPoints.length-5 ] * qPoints[ qPoints.length-5 ]);
 		// 3
-		qPoints[ qPoints.length-3 ] = 2000000D;
-		qPoints[ qPoints.length-2 ] = -2000000D;
+		qPoints[ qPoints.length-3 ] = 10D;
+		qPoints[ qPoints.length-2 ] = -10D;
 		qPoints[ qPoints.length-1 ] =  -(qPoints[ qPoints.length-3 ] * qPoints[ qPoints.length-3 ] + 
 				qPoints[ qPoints.length-2 ] * qPoints[ qPoints.length-2 ]);
 
