@@ -90,10 +90,10 @@ public class Line implements IVo{
 		
 		Point[] far_pL = new Point[4], far_pH = new Point[4];
 		double[] area = new double[4];
-		far_pL[0] = new Point(-(1 << 20), -(1 << 20), 0);
-		far_pL[1] = new Point((1 << 20) - 1, -(1 << 20), 0);
-		far_pL[2] = new Point(-(1 << 20), (1 << 20) - 1, 0);
-		far_pL[3] = new Point((1 << 20) - 1, (1 << 20) - 1, 0);
+		far_pL[0] = new Point(-(1 << 15), -(1 << 15), 0);
+		far_pL[1] = new Point((1 << 15) - 1, -(1 << 15), 0);
+		far_pL[2] = new Point(-(1 << 15), (1 << 15) - 1, 0);
+		far_pL[3] = new Point((1 << 15) - 1, (1 << 15) - 1, 0);
 		double min = 1e60, max = -1e60;
 		for(int i = 0; i < 4; i++ ){
 			far_pH[i] = new Point(far_pL[i]);
@@ -111,8 +111,8 @@ public class Line implements IVo{
 				max = area[i];
 			}
 		}
-		System.out.println(min + " " + ((long)(min)));
-		gf = new Gfunction(0, 16, (long)min, (long)max);
+//		System.out.println(min + " " + (long)MathUtility.getApproximate(min) + " " + max + " " + (long)MathUtility.getApproximate(max));
+		gf = new Gfunction(0, 16, (long)MathUtility.getApproximate(min), (long)MathUtility.getApproximate(max));
 		init_paillier();
 	}
 	
@@ -176,18 +176,37 @@ public class Line implements IVo{
 			long area2 = Point.Areax2(farR_pL, farR_pH, Q);
 			areaRep = seeds.getRepresentation(area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart((long)(- area), false);
+			ServerReturned = gf.GenerateVeryfyPart((long)MathUtility.getApproximate(- area), false);
+//			try {
+//				if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, area2 - 1))){
+//					System.out.println("Pass!");
+//				}else{
+//					System.out.println("Fail!");
+//				}
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}else{
 			if(MathUtility.D(area) != 0){
 				if(isL != true){
 					System.err.println("Error side!");
-					return;
 				}
 			}
 			long area2 = Point.Areax2(farL_pL, farL_pH, Q);
 			areaRep = seeds.getRepresentation(- area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart((long)(- area), true);			
+			ServerReturned = gf.GenerateVeryfyPart((long)MathUtility.getApproximate(- area), true);	
+//			try {
+//				if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, - area2 - 1))){
+//					System.out.println("Pass!");
+//				}else{
+//					System.out.println("Fail!");
+//				}
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 	}
 		
@@ -417,23 +436,54 @@ public class Line implements IVo{
 		System.out.println("For init:\t" + (end -start) / 1000000.0 + " ms");
 		Point Q = new Point (1, 1, 0);
 		//System.out.println("area: " + Point.Areax2(l.o_pL, l.o_pH, Q.doublePoint()));
-		l.GenerateVeryfyPart(Q, false);
-
-		for(int i = 0; i < times; i++){
+//		l.GenerateVeryfyPart(Q, false);
+//
+//		for(int i = 0; i < times; i++){
+//			if(l.ClientVerify(Q)){
+//				//System.out.println("Pass verification");
+//			}else{
+//				System.err.println("fail verification");
+//			}
+//		}
+//		System.err.println("===========================");
+		double[][] data ={
+				{3,	4,	3},
+				{1,	2,	6},
+				{3, 1, 4},
+				{6,	1,	5},
+				{7,	2,	10},
+				{8,	1,	10},
+				{6,	6,	13},
+				{3,	7,	15},
+				{7,	7,	13}
+				};
+		for(int i = 0; i < data.length; i++){
+			if(i == 3) continue;
+			l = new Line(new int[]{(int)data[i][0], (int)data[i][1], (int)data[i][2]}, new int[]{6, 1, 5});
+			
+			Q = new Point (4, 4, 0);
+			//System.out.println("area: " + Point.Areax2(l.o_pL, l.o_pH, Q.doublePoint()));
+			if(i == 0 || i == 2)l.GenerateVeryfyPart(Q, true);
+			else l.GenerateVeryfyPart(Q, false);
+			start = System.currentTimeMillis();	
+			System.out.print("id : " + i + " ");
 			if(l.ClientVerify(Q)){
-				//System.out.println("Pass verification");
+				System.out.println("Pass verification");
 			}else{
 				System.err.println("fail verification");
 			}
 		}
-//		System.err.println("===========================");
-		Q = new Point (0, 1, 0);
+		
+		
+		l = new Line(new int[]{3, 1, 4}, new int[]{6, 1, 5});
+		
+		Q = new Point (4, 4, 0);
 		//System.out.println("area: " + Point.Areax2(l.o_pL, l.o_pH, Q.doublePoint()));
 		l.GenerateVeryfyPart(Q, true);
 		start = System.currentTimeMillis();	
 		for(int i = 0; i < times; i++){
 			if(l.ClientVerify(Q)){
-				//System.out.println("Pass verification");
+				System.out.println("Pass verification");
 			}else{
 				System.err.println("fail verification");
 			}

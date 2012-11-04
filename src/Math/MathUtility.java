@@ -9,7 +9,7 @@ package Math;
  */
 public class MathUtility {
 
-public static double eps = 1e-8;
+public static double eps = 1e-6;
 	
 	/**
 	 * 
@@ -114,6 +114,17 @@ public static double eps = 1e-8;
 			return false;
 		}
 	}
+	
+	/**
+	 * Get approximate value of x.
+	 * 
+	 * */
+	public static double getApproximate(double x){
+		if(D(x - Math.ceil(x)) == 0)return Math.ceil(x);
+		if(D(x - Math.floor(x)) == 0)return Math.floor(x);
+		return x;
+	}
+	
 	
 	/**
 	 * @param args
