@@ -32,17 +32,21 @@ public class PDelaunay {
 			qPoints[i*3+2] = -(points[i][0]*points[i][0] + points[i][1]*points[i][1]) - points[i][2]; // standard half-squared eucledian distance
 		}
 		// 1
-		qPoints[ qPoints.length-9 ] = -2000;
+		qPoints[ qPoints.length-9 ] = -2000000D;
 		qPoints[ qPoints.length-8 ] = 0;
-		qPoints[ qPoints.length-7 ] = -4000000;
+		qPoints[ qPoints.length-7 ] =  -(qPoints[ qPoints.length-9 ] * qPoints[ qPoints.length-9 ] + 
+				qPoints[ qPoints.length-8 ] * qPoints[ qPoints.length-8 ]);
+
 		// 2
-		qPoints[ qPoints.length-6 ] = 2000;
-		qPoints[ qPoints.length-5 ] = 2000;
-		qPoints[ qPoints.length-4 ] = -8000000;
+		qPoints[ qPoints.length-6 ] = 2000000D;
+		qPoints[ qPoints.length-5 ] = 2000000D;
+		qPoints[ qPoints.length-4 ] =  -(qPoints[ qPoints.length-6 ] * qPoints[ qPoints.length-6 ] + 
+				qPoints[ qPoints.length-5 ] * qPoints[ qPoints.length-5 ]);
 		// 3
-		qPoints[ qPoints.length-3 ] = 2000;
-		qPoints[ qPoints.length-2 ] = -2000;
-		qPoints[ qPoints.length-1 ] = -8000000;
+		qPoints[ qPoints.length-3 ] = 2000000D;
+		qPoints[ qPoints.length-2 ] = -2000000D;
+		qPoints[ qPoints.length-1 ] =  -(qPoints[ qPoints.length-3 ] * qPoints[ qPoints.length-3 ] + 
+				qPoints[ qPoints.length-2 ] * qPoints[ qPoints.length-2 ]);
 
 		// prepare quickhull
 		QuickHull3D quickHull = new QuickHull3D(qPoints);
@@ -105,7 +109,6 @@ public class PDelaunay {
 		float [][] points = {{(float) -2.5,0,1}, {(float) 2.5,0,31}};
 		PDelaunay pd = new PDelaunay(points);
 		System.out.println("0," + (pd.getLinked(1)[0] - 1));
-		
 	}
 
 }

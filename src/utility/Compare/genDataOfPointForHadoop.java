@@ -61,7 +61,7 @@ public class genDataOfPointForHadoop {
 		for(int i = 0; i < points.size(); i++){
 			int[] pid = delaunay.getLinked(i + 1);
 			ArrayList<Long> tmp = new ArrayList<Long>();
-			Point pPoint = new Point((int)points.get(i)[0], (int)points.get(i)[1]);
+			Point pPoint = new Point((int)points.get(i)[0], (int)points.get(i)[1], 0);
 			pw.print((long)idmap.get(i) + " " + pPoint.x + " " + pPoint.y);
 			for(int j = 0; j < pid.length && pid[j] > 0; j++){
 				tmp.add((long)idmap.get(pid[j] - 1));
