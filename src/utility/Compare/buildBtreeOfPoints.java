@@ -22,7 +22,7 @@ import jdbm.RecordManagerFactory;
 public class buildBtreeOfPoints {
 	public static boolean DEBUG = true;
 	public static boolean ISCAR = false;
-	public static long SCALE = 1000000;
+	public static long SCALE = (5000);
 //	public static String filename = "database/PointsData.NE";
 	public RecordManager recmanOfPoint = null;
 	public PrimaryTreeMap<Long, byte[]> btOfPoint = null;
@@ -86,7 +86,7 @@ public class buildBtreeOfPoints {
 						System.out.println("Thread:\t" + threadId + "\tid:\t" + curId);
 						int[] pid = delaunay.getLinked(curId + 1);
 						ArrayList<Long> tmp = new ArrayList<Long>();
-						Point pPoint = new Point((int)points.get(curId)[0], (int)points.get(curId)[1]);
+						Point pPoint = new Point((int)points.get(curId)[0], (int)points.get(curId)[1], (int)points.get(curId)[2]);
 						for(int j = 0; j < pid.length && pid[j] > 0; j++){
 							tmp.add((long)idmap.get(pid[j] - 1));
 						}

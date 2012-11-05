@@ -27,7 +27,7 @@ import mesh.PDelaunay;
  * @author chenqian
  * Build index for data of point. The index has two files. 
  * One is *.dat, and the other is *.idx, which are data and index respectively.
- * We dont use btree this time. We use a hash tree to store the index, and every 
+ * We dont use btree this time. We use a hash map to store the index, and every 
  * tuple has <position, length>.
  * The input data should be formatted to [0, 1].
  * 
