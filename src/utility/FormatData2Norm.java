@@ -15,6 +15,8 @@ import java.util.Scanner;
  */
 public class FormatData2Norm {
 
+	public static int scale = 10000;
+	
 	public static void loadFile(String sourceFileName, String destFileName) throws FileNotFoundException{
 		Scanner filein = new Scanner(new File(sourceFileName));
 		PrintWriter pw = new PrintWriter(new File(destFileName));
@@ -36,9 +38,9 @@ public class FormatData2Norm {
 		filein.close();
 		for(int i = 0; i < points.size(); i++){
 			double[] point = points.get(i);
-			pw.print(point[0] / (maxx - minx));
+			pw.print((int)(point[0] / (maxx - minx) * scale));
 			pw.print("\t");
-			pw.println(point[1] / (maxy - miny));
+			pw.println((int)(point[1] / (maxy - miny) * scale));
 		}
 		pw.flush();
 		pw.close();
