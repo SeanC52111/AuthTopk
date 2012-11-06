@@ -5,6 +5,7 @@ do
 
 	ssh csr$[$i] 'rm -rf "/tmp/qchen"'
 	ssh csr$[$i] 'mkdir "/tmp/qchen"'
+	ssh csr$[$i] 'mkdir "/tmp/qchen/database"'
 	echo "csr$i finish";
 	#ssh csr$[$i + 40] 'if [ ! -d "/tmp/qchen"]; then mkdir "/tmp/qchen" else rm -rf "/tmp/qchen" & mkdir "/tmp/qchen"; fi' &
 done
