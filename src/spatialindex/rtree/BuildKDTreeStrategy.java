@@ -19,51 +19,29 @@ public class BuildKDTreeStrategy implements IQueryStrategy{
 	ArrayList<Integer> ids = null;
 	kdentry [] node_list = null;
 	RTree rtree = null;
-	public int d = 2;
+	public int d;
 	public void build_kd_tree_internal(int s, int e, int depth){
 		if(s >= e)return;
-		int n = e - s + 1;
-		if(depth % (2 * d) == 0){
+		final int indicator = depth % (2 * d);
+		if(indicator < d){			
 			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
-
+				
 				@Override
 				public int compare(kdentry o1, kdentry o2) {
 					// TODO Auto-generated method stub
-					if(o1.region.m_pLow[0] < o2.region.m_pLow[0])return -1;
-					else if(o1.region.m_pLow[0] > o2.region.m_pLow[0])return 1;
+					if(o1.region.m_pLow[indicator] < o2.region.m_pLow[indicator])return -1;
+					else if(o1.region.m_pLow[indicator] > o2.region.m_pLow[indicator])return 1;
 					else return 0;
 				}
 			});
-		}else if(depth % (2 * d) == 1){
+		}else{			
 			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
 				
 				@Override
 				public int compare(kdentry o1, kdentry o2) {
 					// TODO Auto-generated method stub
-					if(o1.region.m_pHigh[0] < o2.region.m_pHigh[0])return -1;
-					else if(o1.region.m_pHigh[0] > o2.region.m_pHigh[0])return 1;
-					else return 0;
-				}
-			});
-		}else if(depth % (2 * d) == 2){
-			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
-				
-				@Override
-				public int compare(kdentry o1, kdentry o2) {
-					// TODO Auto-generated method stub
-					if(o1.region.m_pLow[1] < o2.region.m_pLow[1])return -1;
-					else if(o1.region.m_pLow[1] > o2.region.m_pLow[1])return 1;
-					else return 0;
-				}
-			});			
-		}else{
-			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
-				
-				@Override
-				public int compare(kdentry o1, kdentry o2) {
-					// TODO Auto-generated method stub
-					if(o1.region.m_pHigh[1] < o2.region.m_pHigh[1])return -1;
-					else if(o1.region.m_pHigh[1] > o2.region.m_pHigh[1])return 1;
+					if(o1.region.m_pHigh[indicator - d] < o2.region.m_pHigh[indicator - d])return -1;
+					else if(o1.region.m_pHigh[indicator - d] > o2.region.m_pHigh[indicator - d])return 1;
 					else return 0;
 				}
 			});
@@ -76,30 +54,17 @@ public class BuildKDTreeStrategy implements IQueryStrategy{
 
 	public void build_kd_tree_leaf(int s, int e, int depth){
 		if(s >= e)return;
-		int n = e - s + 1;
-		if(depth % 2 == 0){
-			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
-
-				@Override
-				public int compare(kdentry o1, kdentry o2) {
-					// TODO Auto-generated method stub
-					if(o1.region.m_pLow[0] < o2.region.m_pLow[0])return -1;
-					else if(o1.region.m_pLow[0] > o2.region.m_pLow[0])return 1;
-					else return 0;
-				}
-			});
-		}else{
-			Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
-
-				@Override
-				public int compare(kdentry o1, kdentry o2) {
-					// TODO Auto-generated method stub
-					if(o1.region.m_pLow[1] < o2.region.m_pLow[1])return -1;
-					else if(o1.region.m_pLow[1] > o2.region.m_pLow[1])return 1;
-					else return 0;
-				}
-			});
-		}
+		final int indicater = depth % d;
+		Arrays.sort(node_list, s, e, new Comparator<kdentry>() {
+			
+			@Override
+			public int compare(kdentry o1, kdentry o2) {
+				// TODO Auto-generated method stub
+				if(o1.region.m_pLow[indicater] < o2.region.m_pLow[indicater])return -1;
+				else if(o1.region.m_pLow[indicater] > o2.region.m_pLow[indicater])return 1;
+				else return 0;
+			}
+		});
 		int mid = (e + s) >> 1;
 		build_kd_tree_leaf(s, mid, depth + 1);
 		build_kd_tree_leaf(mid + 1, e, depth + 1);
@@ -148,6 +113,7 @@ public class BuildKDTreeStrategy implements IQueryStrategy{
 
 	public BuildKDTreeStrategy(RTree rtree){
 		this.rtree = rtree;
+		d = this.rtree.m_dimension;
 		ids = new ArrayList<Integer>();
 	}
 	

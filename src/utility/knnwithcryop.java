@@ -43,6 +43,14 @@ public class knnwithcryop {
 //	public static String FileInPath = "input/data.in";
 	public static boolean IS_BATCH_QUERY;
 	
+	
+	
+	/**
+	 * MyRtree is with/without embedded kd-tree.
+	 * Srtree is for MRTree.
+	 * 
+	 * 
+	 * */
 	public static void LoadMyRTree(String localRtreeFilePath, boolean isLoad, MyRtree[] _myrtree, SecurityTree[] _srtree, boolean isKDtree) throws IndexOutOfBoundsException, Exception{
 		//load rtree
 		PropertySet ps = new PropertySet();
@@ -56,7 +64,6 @@ public class knnwithcryop {
 		if(!isLoad && isKDtree){
 			_myrtree[0].BuildEmbededIndex_KDTree();
 		}
-		_myrtree[0].closeBtree();
 		_srtree[0] = new SecurityTree(_myrtree[0], localRtreeFilePath, isLoad);
 	}
 	
@@ -77,6 +84,11 @@ public class knnwithcryop {
 				System.out.println("Success!");
 			}else if(line.equalsIgnoreCase("b")){
 				while(true){
+					/**
+					 * a,b,c is for normal ones;
+					 * d,e,f is for embedded ones.
+					 * 
+					 * */
 					System.out.println("(a) NE\n(b) CA\n(c) test\n(d) NE\n(e) CA\n(f) test\n(g) exit");
 					line = in.nextLine();
 					String sourceString = null, indexString = null;
@@ -112,7 +124,6 @@ public class knnwithcryop {
 						MyRtree[] myrtrees = new MyRtree[1];
 						SecurityTree[] srtrees = new SecurityTree[1];
 						LoadMyRTree(indexString, false, myrtrees, srtrees, false);
-						myrtrees[0].closeBtree();
 						myrtree = myrtrees[0];
 						srtree = srtrees[0];
 						System.out.println("fin building srtree.");						
@@ -123,7 +134,6 @@ public class knnwithcryop {
 						rtree_kd = RTree.createRTree(new String[] {sourceString, indexString + "_kd", "100", "10nn", destFileName + ".PointsData", destFileName + ".LinesData.1HOP"});
 						System.out.println("fin building embeded kd rtree.");
 						LoadMyRTree(indexString + "_kd", false, myrtrees_kd, srtrees_kd, true);
-						myrtrees_kd[0].closeBtree();
 						myrtree_kd = myrtrees_kd[0];
 						srtree_kd = srtrees_kd[0];
 					}
@@ -282,7 +292,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[0].update(vo.getStatistics());
 			if(type == -1)System.out.println("==============above rtree greedy===============");
-			myrtree.closeBtree();
 		}
 		
 		if(limit > 0 && (type == -1 || type == 1)){	
@@ -298,7 +307,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[1].update(vo.getStatistics());
 			if(type == -1)System.out.println("==============above rtree===============");
-			myrtree.closeBtree();
 		}
 		
 //		if(type == -1)return;
@@ -316,7 +324,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[2].update(vo.getStatistics());
 			if(type == -1)System.out.println("==============above embeded kdtree greedy===============");
-			myrtree_kd.closeBtree();
 		}
 		
 		if(limit > 0 && (type == -1 || type == 3)){
@@ -332,7 +339,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[3].update(vo.getStatistics());
 			if(type == -1)System.out.println("=============above embeded kdtree================");
-			myrtree_kd.closeBtree();
 		}
 		if(type == -1 || type == 4){
 			svisitor = new SecurityVisitor();
@@ -351,7 +357,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[4].update(vo.getStatistics());
 			if(type == -1)System.out.println("==============above voronoi diagram greedy===============");
-			myrtree.closeBtree();
 		}
 		if(limit > 0 && (type == -1 || type == 5)){
 			svisitor = new SecurityVisitor();
@@ -369,7 +374,6 @@ public class knnwithcryop {
 			vo.getStatistics().printtoffile(pw);
 			if(stat != null)stat[5].update(vo.getStatistics());
 			if(type == -1)System.out.println("=============above voronoi diagram================");
-			myrtree.closeBtree();
 		}
 		
 		

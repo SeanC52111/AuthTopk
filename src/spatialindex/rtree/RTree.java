@@ -32,14 +32,18 @@ package spatialindex.rtree;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,10 +85,10 @@ import utility.security.SecurityUtility;
 
 public class RTree implements ISpatialIndex {
 	
-	public RecordManager recmanOfPoint = null;
-	public PrimaryTreeMap<Long, byte[]> btOfPoint = null;
-	public RecordManager recmanOfLine = null;
-	public PrimaryTreeMap<Long, byte[]> btOfLine = null;
+	public RandomAccessFile rafPoint = null;
+	public RandomAccessFile rafLine = null;
+	public HashMap<Long, long[]> tOfPoint = null;
+	public HashMap<Long, long[]> tOfLine = null;
 	public String destFileNamePoint, destFileNameLine;
 	IShape queryRegion = null;
 
@@ -204,7 +208,7 @@ public class RTree implements ISpatialIndex {
 			ps2.setProperty("LeafCapacity", i);
 			// Index capacity and leaf capacity may be different.
 
-			i = new Integer(2);
+			i = new Integer(3);
 			ps2.setProperty("Dimension", i);
 			ps2.setProperty("destFileNamePoint", args[4]);
 			ps2.setProperty("destFileNameLine", args[5]);
@@ -214,30 +218,38 @@ public class RTree implements ISpatialIndex {
 			int count = 0;
 			//int indexIO = 0;
 			//int leafIO = 0;
-			int id, op;
-			double x1, x2, y1, y2;
-			double[] f1 = new double[2];
-			double[] f2 = new double[2];
+			int id = 0, op;
+			double x1, y1, z1;
+			double[] f1 = new double[3];
+			double[] f2 = new double[3];
 
 			long start = System.currentTimeMillis();
 			String line = lr.readLine();
 
 			while (line != null) {
 				StringTokenizer st = new StringTokenizer(line);
-				op = new Integer(st.nextToken()).intValue();
-				id = new Integer(st.nextToken()).intValue();
-				x1 = new Double(st.nextToken()).doubleValue();
-				y1 = new Double(st.nextToken()).doubleValue();
-				x2 = new Double(st.nextToken()).doubleValue();
-				y2 = new Double(st.nextToken()).doubleValue();
+//				op = new Integer(st.nextToken()).intValue();
+//				id = new Integer(st.nextToken()).intValue();
+//				x1 = new Double(st.nextToken()).doubleValue();
+//				y1 = new Double(st.nextToken()).doubleValue();
+//				x2 = new Double(st.nextToken()).doubleValue();
+//				y2 = new Double(st.nextToken()).doubleValue();
 
+				op = 1;
+				x1 = Double.parseDouble(st.nextToken());
+				y1 = Double.parseDouble(st.nextToken());
+				z1 = Double.parseDouble(st.nextToken());
+				
 				if (op == 0) {
 					//delete
 
 					f1[0] = x1;
 					f1[1] = y1;
-					f2[0] = x2;
-					f2[1] = y2;
+					f1[2] = Math.sqrt(z1);
+					f2[0] = x1;
+					f2[1] = y1;
+					f2[2] = Math.sqrt(z1);
+					
 					Region r = new Region(f1, f2);
 
 					if (tree.deleteData(r, id) == false) {
@@ -247,10 +259,14 @@ public class RTree implements ISpatialIndex {
 				} else if (op == 1) {
 					//insert
 
+
 					f1[0] = x1;
 					f1[1] = y1;
-					f2[0] = x2;
-					f2[1] = y2;
+					f1[2] = Math.sqrt(z1);
+					f2[0] = x1;
+					f2[1] = y1;
+					f2[2] = Math.sqrt(z1);
+					
 					Region r = new Region(f1, f2);
 
 					//String data = r.toString();
@@ -273,14 +289,19 @@ public class RTree implements ISpatialIndex {
 					//tree.insertData(data.getBytes(), r, id);
 
 					tree.insertData(null, r, id);
+					id ++;
 					// example of passing a null pointer as the associated data.
 				} else if (op == 2) {
 					//query
 
+
 					f1[0] = x1;
 					f1[1] = y1;
-					f2[0] = x2;
-					f2[1] = y2;
+					f1[2] = Math.sqrt(z1);
+					f2[0] = x1;
+					f2[1] = y1;
+					f2[2] = Math.sqrt(z1);
+					
 					Region r = new Region(f1, f2);
 
 					//MyVisitor vis = new MyVisitor();
@@ -335,40 +356,28 @@ public class RTree implements ISpatialIndex {
 		}
 	}
 
-	public void loadBtreeOfPoints(){
+	public void loadIndexOfPoints(){
 		try {
-			recmanOfPoint = RecordManagerFactory.createRecordManager(destFileNamePoint);
-			btOfPoint = recmanOfPoint.treeMap("treemap");
+			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(destFileNamePoint + ".idx"))));
+			rafPoint = new RandomAccessFile(destFileNamePoint + ".dat", "r");
+			tOfPoint = new HashMap<Long, long[]>();
+			while(dis.available() > 0){
+				tOfPoint.put(dis.readLong(), new long[]{dis.readLong(), dis.readLong()});
+			}
+			dis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void clearBtreeCache(){
+	public void closeIndex(){
 		try {
-			if(recmanOfLine != null){
-				recmanOfLine.clearCache();
+			if(rafPoint != null){
+				rafPoint.close();
 			}
-			if(recmanOfPoint != null){
-				recmanOfPoint.clearCache();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public void closeBtree(){
-		try {
-			if(recmanOfPoint != null){
-				recmanOfPoint.close();
-				recmanOfPoint = null;
-			}
-			if(recmanOfLine != null){
-				recmanOfLine.close();
-				recmanOfLine = null;
+			if(rafLine != null){
+				rafLine.close();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -376,58 +385,89 @@ public class RTree implements ISpatialIndex {
 		}
 	}
 	
-	public void loadBtreeOfLines(){
+	public void loadIndexOfLines(){
 		try {
-			recmanOfLine = RecordManagerFactory.createRecordManager(destFileNameLine);
-			btOfLine = recmanOfLine.treeMap("treemap");
+			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(destFileNameLine + ".idx"))));
+			rafLine = new RandomAccessFile(destFileNameLine + ".dat", "r");
+			while(dis.available() > 0){
+				tOfLine.put(dis.readLong(), new long[]{dis.readLong(), dis.readLong()});
+			}
+			dis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
 	
-	public void loadBtree(){
-		loadBtreeOfPoints();
-		loadBtreeOfLines();
+	public void loadIndex(){
+		loadIndexOfPoints();
+		loadIndexOfLines();
 	}
 	
-	public DataOfPoint loadDataOfPointFromBtree(long id){
-		if(btOfPoint == null || recmanOfPoint == null){
-			loadBtreeOfPoints();
+	public DataOfPoint loadDataOfPointFromIndex(long id){
+		if(rafPoint == null || !tOfPoint.containsKey(id)){
+			loadIndexOfPoints();
 		}
-		if(btOfPoint.containsKey(id) == false){
+		if(tOfPoint.containsKey(id) == false){
 			System.err.println("Not found point :\t" + id);
 			return null;
 		}
-		byte[] data = btOfPoint.get(id);
+		long[] tmp = tOfPoint.get(id);
+		long pos = tmp[0], len = tmp[1];
+		byte[] data = new byte[(int)len];
+		try {
+			rafPoint.seek(pos);
+			rafPoint.read(data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		DataOfPoint dataOfPoint = new DataOfPoint(data);
 		return dataOfPoint;
 	}
 	
-	public DataOfLine loadDataOfLineFromBtree(long id1, long id2){
-		if(btOfLine == null || recmanOfLine == null){
-			loadBtreeOfLines();
-		}
+	public DataOfLine loadDataOfLineFromIndex(long id1, long id2){
 		long id = DataOfLine.calcLineId(id1, id2);
-		if(btOfLine.containsKey(id) == false){
+		if(tOfLine == null || !tOfLine.containsKey(id)){
+			loadIndexOfLines();
+		}
+		if(tOfLine.containsKey(id) == false){
 			System.err.println("Not found line:\t" + id1 + ", " + id2);
 			return null;
 		}
-		byte[] data = btOfLine.get(id);
+		long[] tmp = tOfLine.get(id);
+		long pos = tmp[0], len = tmp[1];
+		byte[] data = new byte[(int)len];
+		try {
+			rafLine.seek(pos);
+			rafLine.read(data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		DataOfLine dataOfLine = new DataOfLine(data);
 		return dataOfLine;
 	}
 	
 	public DataOfLine loadDataOfLineFromBtree(int id1, int id2){
-		if(btOfLine == null || recmanOfLine == null){
-			loadBtreeOfLines();
-		}
 		long id = DataOfLine.calcLineId(id1, id2);
-		if(btOfLine.containsKey(id) == false){
-			//System.err.println("Not found line:\t" + id1 + ", " + id2);
+		if(tOfLine == null || !tOfLine.containsKey(id)){
+			loadIndexOfLines();
+		}
+		if(tOfLine.containsKey(id) == false){
+			System.err.println("Not found line:\t" + id1 + ", " + id2);
 			return null;
 		}
-		byte[] data = btOfLine.get(id);
+		long[] tmp = tOfLine.get(id);
+		long pos = tmp[0], len = tmp[1];
+		byte[] data = new byte[(int)len];
+		try {
+			rafLine.seek(pos);
+			rafLine.read(data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		DataOfLine dataOfLine = new DataOfLine(data);
 		return dataOfLine;
 	}

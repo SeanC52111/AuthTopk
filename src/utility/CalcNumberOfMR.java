@@ -51,7 +51,6 @@ public class CalcNumberOfMR {
 		if(!isLoad && isKDtree){
 			_myrtree[0].BuildEmbededIndex_KDTree();
 		}
-		_myrtree[0].closeBtree();
 		_srtree[0] = new SecurityTree(_myrtree[0], localRtreeFilePath, isLoad);
 	}
 	/**

@@ -88,7 +88,7 @@ public class VO implements Serializable {
 //			System.out.print(key + " ");
 			if(dataState.get(key) == 0){
 				dataList[dataLen ++] = key;
-				DataOfPoint dop = rtree.loadDataOfPointFromBtree(key);
+				DataOfPoint dop = rtree.loadDataOfPointFromIndex(key);
 				if(neighborsOfp1.size() == 0){
 					for(int i = 0; i < dop.delaunayIds.length; i++){
 						neighborsOfp1.add(dop.delaunayIds[i].intValue());
@@ -119,10 +119,10 @@ public class VO implements Serializable {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				// TODO Auto-generated method stub
-				DataOfPoint dp1 = rtree.loadDataOfPointFromBtree(o1.longValue());
-				DataOfPoint dp2 = rtree.loadDataOfPointFromBtree(o2.longValue());
-				double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y}));
-				double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y}));
+				DataOfPoint dp1 = rtree.loadDataOfPointFromIndex(o1.longValue());
+				DataOfPoint dp2 = rtree.loadDataOfPointFromIndex(o2.longValue());
+				double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y, Math.sqrt(dp1.p.w)}));
+				double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y, Math.sqrt(dp2.p.w)}));
 				if(dist1 < dist2) return -1;
 				else if(dist1 > dist2)return 1;
 				return 0;
@@ -132,10 +132,10 @@ public class VO implements Serializable {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				// TODO Auto-generated method stub
-				DataOfPoint dp1 = rtree.loadDataOfPointFromBtree(o1.longValue());
-				DataOfPoint dp2 = rtree.loadDataOfPointFromBtree(o2.longValue());
-				double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y}));
-				double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y}));
+				DataOfPoint dp1 = rtree.loadDataOfPointFromIndex(o1.longValue());
+				DataOfPoint dp2 = rtree.loadDataOfPointFromIndex(o2.longValue());
+				double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y, Math.sqrt(dp1.p.w)}));
+				double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y, Math.sqrt(dp2.p.w)}));
 				if(dist1 > dist2) return -1;
 				else if(dist1 < dist2)return 1;
 				return 0;
@@ -150,7 +150,7 @@ public class VO implements Serializable {
 			for(int i = 0; i < dataLen; i ++){
 				Integer pi = dataList[i];
 				DataOfLine dataofline = null;
-				dataVO.put(pi, new VOCell(false, rtree.loadDataOfPointFromBtree(pi), -1));
+				dataVO.put(pi, new VOCell(false, rtree.loadDataOfPointFromIndex(pi), -1));
 				if(neighborsOfp1.contains(pi)){
 					dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[dataLen - 1])){				
@@ -194,7 +194,7 @@ public class VO implements Serializable {
 			}
 			for(int i = 1; i < fDataLen; i ++){
 				Integer pi = fDataList[i];
-				dataVO.put(pi, new VOCell(true, rtree.loadDataOfPointFromBtree(pi), -1));
+				dataVO.put(pi, new VOCell(true, rtree.loadDataOfPointFromIndex(pi), -1));
 				boolean found = false;
 				for(int j = 0; j < i; j++){//Dist(j, k) >= Dist(i, k)
 					Integer pj = fDataList[j];
@@ -224,7 +224,7 @@ public class VO implements Serializable {
 			for(int i = 0; i < dataLen; i++){
 				Integer pi = dataList[i];
 				DataOfLine dataofline = null;
-				dataVO.put(pi, new VOCell(false, rtree.loadDataOfPointFromBtree(pi), -1));
+				dataVO.put(pi, new VOCell(false, rtree.loadDataOfPointFromIndex(pi), -1));
 //				System.out.println("res : " + pi + " distance : " + 
 //						utility.security.Point.Distance2((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 
 //						dataVO.get(pi).dataOfPoint.p.x, dataVO.get(pi).dataOfPoint.p.y));
@@ -265,7 +265,7 @@ public class VO implements Serializable {
 			}
 			for(int i = 1; i < fDataLen; i++){
 				Integer pi = fDataList[i];
-				dataVO.put(pi, new VOCell(true, rtree.loadDataOfPointFromBtree(pi), -1));
+				dataVO.put(pi, new VOCell(true, rtree.loadDataOfPointFromIndex(pi), -1));
 				DataOfLine dataofline = null;
 //				System.out.println("far : " + pi + " distance : " + 
 //						utility.security.Point.Distance2((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 
@@ -342,7 +342,7 @@ public class VO implements Serializable {
 		type_VO = type;
 		states = new ArrayList<StateCell>();
 		limit = _limit;
-		utility.security.Point sP = new utility.security.Point((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(0));
+		utility.security.Point sP = new utility.security.Point((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 0); // Note here
 		sP.buildByPaillier();
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end;
@@ -397,7 +397,7 @@ public class VO implements Serializable {
 			for(int i = 0; i < dataLen; i ++){
 				StateCell celli = dataList[i];
 				if(celli.isLeafEntry()){
-					dataVO.put(celli.getId(), new VOCell(false, rtree.loadDataOfPointFromBtree(celli.getId()), -1));
+					dataVO.put(celli.getId(), new VOCell(false, rtree.loadDataOfPointFromIndex(celli.getId()), -1));
 				}else{
 					Node node = rtree.readNode(celli.getId());
 					SecurityNode snode = srtree.getSecurityNode(celli.getId());
@@ -454,7 +454,7 @@ public class VO implements Serializable {
 			for(int i = 1; i < fDataLen; i ++){
 				StateCell celli = fDataList[i];
 				if(celli.isLeafEntry()){
-					dataVO.put(celli.getId(), new VOCell(true, rtree.loadDataOfPointFromBtree(celli.getId()), -1));
+					dataVO.put(celli.getId(), new VOCell(true, rtree.loadDataOfPointFromIndex(celli.getId()), -1));
 				}else{
 					Node node = rtree.readNode(celli.getId());
 					SecurityNode snode = srtree.getSecurityNode(celli.getId());
@@ -504,7 +504,7 @@ public class VO implements Serializable {
 			for(int i = 0; i < dataLen; i++){
 				StateCell celli = dataList[i];
 				if(celli.isLeafEntry()){
-					dataVO.put(celli.getId(), new VOCell(false, rtree.loadDataOfPointFromBtree(celli.getId()), -1));
+					dataVO.put(celli.getId(), new VOCell(false, rtree.loadDataOfPointFromIndex(celli.getId()), -1));
 				}else{
 					Node node = rtree.readNode(celli.getId());
 					SecurityNode snode = srtree.getSecurityNode(celli.getId());
@@ -551,7 +551,7 @@ public class VO implements Serializable {
 			for(int i = 1; i < fDataLen; i++){
 				StateCell celli = fDataList[i];
 				if(celli.isLeafEntry()){
-					dataVO.put(celli.getId(), new VOCell(true, rtree.loadDataOfPointFromBtree(celli.getId()), -1));
+					dataVO.put(celli.getId(), new VOCell(true, rtree.loadDataOfPointFromIndex(celli.getId()), -1));
 				}else{
 					Node node = rtree.readNode(celli.getId());
 					SecurityNode snode = srtree.getSecurityNode(celli.getId());
@@ -1050,10 +1050,10 @@ public class VO implements Serializable {
 			signature = dataOfLine.signature;
 		}
 		public void generateVeryfyPart(Point q){
-			line.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1)));
+			line.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0), true); // here may need further check, about 'true'
 		}
 		public boolean verify(Point q){
-			return line.ClientVerify(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1)));
+			return line.ClientVerify(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0));
 		}
 		
 		public long getVOSize(){
@@ -1077,10 +1077,10 @@ public class VO implements Serializable {
 			dc = new DistanceCompare(p1, p2);
 		}
 		public void generateVeryfyPart(Point q){
-			dc.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1)));
+			dc.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0));
 		}
 		public boolean verify(Point q){
-			return dc.ClientVerify(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1)));
+			return dc.ClientVerify(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0));
 		}
 		
 		public long getVOSize(){

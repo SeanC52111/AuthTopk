@@ -282,7 +282,7 @@ public class SecurityNode {
 			String tmpGvalue[] = new String[8];
 			for(int r = 0; r < 2; r++){
 				for(int c = 0; c < 2; c++){
-					DataOfPoint dataOfPoint = rTree.loadDataOfPointFromBtree(correspondingMBRids[r][c]);
+					DataOfPoint dataOfPoint = rTree.loadDataOfPointFromIndex(correspondingMBRids[r][c]);
 					if(c == 0){
 						tmpGvalue[r * 2 + c] = dataOfPoint.p.getDigestX(); 
 						tmpGvalue[r * 2 + c + 4] = dataOfPoint.gf_x.getDigest();
@@ -304,7 +304,7 @@ public class SecurityNode {
 			correspondingMBRids = new long[2][2];
 			correspondingMBR = new long[2][2];
 			for (int i = 0; i < childCount; i++) {
-				DataOfPoint dataOfPoint = rTree.loadDataOfPointFromBtree(correspondNode.m_pIdentifier[i]);
+				DataOfPoint dataOfPoint = rTree.loadDataOfPointFromIndex(correspondNode.m_pIdentifier[i]);
 				childGValues.add(dataOfPoint.p.getDigest());
 				childAttrHashValues.add(new Integer(correspondNode.m_pIdentifier[i]).toString());
 //				if(correspondNode.m_pIdentifier[i] == 966)
@@ -341,7 +341,7 @@ public class SecurityNode {
 			String tmpGvalue[] = new String[8];
 			for(int r = 0; r < 2; r++){
 				for(int c = 0; c < 2; c++){
-					DataOfPoint dataOfPoint = rTree.loadDataOfPointFromBtree(correspondingMBRids[r][c]);
+					DataOfPoint dataOfPoint = rTree.loadDataOfPointFromIndex(correspondingMBRids[r][c]);
 					if(c == 0){
 						tmpGvalue[r * 2 + c] = dataOfPoint.p.getDigestX(); 
 						tmpGvalue[r * 2 + c + 4] = dataOfPoint.gf_x.getDigest();
@@ -379,7 +379,7 @@ public class SecurityNode {
 //				//System.out.println(snode.getChildGValueById(i));
 //		}
 		if(level > 0){
-			rTree.closeBtree();
+//			rTree.closeBtree();
 		}
 		return len + data.length;
 	}
@@ -393,10 +393,10 @@ public class SecurityNode {
 	}
 	public DataOfPoint[] getDOPs(RTree rTree){
 		dop = new DataOfPoint[2];
-		DataOfPoint dop00 = rTree.loadDataOfPointFromBtree(correspondingMBRids[0][0]);
-		DataOfPoint dop01 = rTree.loadDataOfPointFromBtree(correspondingMBRids[0][1]);
-		DataOfPoint dop10 = rTree.loadDataOfPointFromBtree(correspondingMBRids[1][0]);
-		DataOfPoint dop11 = rTree.loadDataOfPointFromBtree(correspondingMBRids[1][1]);
+		DataOfPoint dop00 = rTree.loadDataOfPointFromIndex(correspondingMBRids[0][0]);
+		DataOfPoint dop01 = rTree.loadDataOfPointFromIndex(correspondingMBRids[0][1]);
+		DataOfPoint dop10 = rTree.loadDataOfPointFromIndex(correspondingMBRids[1][0]);
+		DataOfPoint dop11 = rTree.loadDataOfPointFromIndex(correspondingMBRids[1][1]);
 		dop[0] = new DataOfPoint(new Point(dop00.p, dop01.p), dop00.gf_x, dop01.gf_y);
 		dop[1] = new DataOfPoint(new Point(dop10.p, dop11.p), dop10.gf_x, dop11.gf_y);
 		return dop;

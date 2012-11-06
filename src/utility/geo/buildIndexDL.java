@@ -94,7 +94,7 @@ public class buildIndexDL {
 							lock[0] ++;
 						}
 						if(curId >= limit)break;
-						System.out.println("Thread:\t" + threadId + "\tid:\t" + curId);
+						if(curId % 2000 == 0)System.out.println("Thread:\t" + threadId + "\tid:\t" + curId);
 						ArrayList<Long> tmp = new ArrayList<Long>();
 						int[] point = points.get(curId);
 						Point pPoint = new Point(point[0], point[1], point[2]);
