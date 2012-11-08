@@ -1,0 +1,1 @@
+scp -r batch_cmd/* qchen@csr69.comp.hkbu.edu.hk:~/batch_cmd/
