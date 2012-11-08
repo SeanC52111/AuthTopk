@@ -31,7 +31,7 @@ public class buildIndexDL {
 
 	
 	public static ArrayList<int[]> points = null;	
-	public static int ThreadNum = 1;
+	public static int ThreadNum = 8;
 	public static boolean[] threadStatus = new boolean[ThreadNum];
 	public static RSA rsa = new RSA(); // sign for every data of point.
 
@@ -116,7 +116,7 @@ public class buildIndexDL {
 									DataOfLine nDataOfLine = dls.get(i);
 									byte[] data = nDataOfLine.writeToBytes();
 									dos_dat.write(data);
-									dos_idx.writeLong(curId);
+									dos_idx.writeLong(nDataOfLine.getLineId());
 									dos_idx.writeLong(w_lock[0]);
 									dos_idx.writeLong(data.length);
 									w_lock[0] += data.length;

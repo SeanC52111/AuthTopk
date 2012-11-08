@@ -18,6 +18,9 @@ public class DataOfPoint{
 	public Long[] delaunayIds = null;
 	public String signature;
 	
+	public int getPointId(){
+		return pid;
+	}
 	
 	public DataOfPoint(){
 		p = new Point();

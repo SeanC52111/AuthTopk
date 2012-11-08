@@ -82,6 +82,10 @@ public class DataOfLine {
 		line.readFromFile(dis);
 	}
 
+	public long getLineId(){
+		return lid;
+	}
+	
 	public static long calcLineId(int id1, int id2){
 		if(id1 > id2){
 			return ((long)id2) * M + id1;
