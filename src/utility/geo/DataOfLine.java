@@ -4,8 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
 
+import utility.Compare.DataOfPoint;
 import utility.security.DataIO;
 import utility.security.RSA;
 import utility.security.SecurityUtility;
@@ -111,11 +117,40 @@ public class DataOfLine {
 	public String signWithRSA(RSA rsa){
 		return rsa.encrypt(getDigest());
 	}
+	
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-
+		ArrayList<long[]> testIndexs = new ArrayList<long[]>();
+		DataInputStream dis = new DataInputStream(new FileInputStream(new File("input/NE.dl.idx")));
+		System.out.println("Read from file:");
+		long id, p, l;
+		while(dis.available() > 0){
+			id = dis.readLong();
+			p = dis.readLong();
+			l = dis.readLong();
+			testIndexs.add(new long[]{id, p, l});
+			System.out.println(id);
+		}
+		dis.close();
+		System.out.println("Begin test:");
+		RandomAccessFile raf = new RandomAccessFile("input/NE.dl.dat", "r");
+		for(int i = 0; i < testIndexs.size(); i++){
+			long [] idx = testIndexs.get(i);
+			raf.seek(idx[1]);
+			byte[] data = new byte[(int) idx[2]];
+			raf.read(data);
+			DataOfLine dl = new DataOfLine(data);
+			if(dl.getLineId() != idx[0]){
+				System.out.print("x");
+			}else{
+				System.out.print(".");
+			}
+			if(i % 100 == 99)System.out.println("");
+		}
+		raf.close();
 	}
 }
