@@ -93,7 +93,7 @@ public class knnwithcryop {
 					line = in.nextLine();
 					String sourceString = null, indexString = null;
 					if(line.equalsIgnoreCase("a")){
-						sourceString = "./source/NE.dat";
+						sourceString = "./input/NE.pd.dat";
 						indexString = "./database/NE";
 					}else if(line.equalsIgnoreCase("b")){
 						sourceString = "./source/CA.dat";
@@ -102,7 +102,7 @@ public class knnwithcryop {
 						sourceString = "./source/test.dat";
 						indexString = "./database/test";
 					}else if(line.equalsIgnoreCase("d")){
-						sourceString = "./source/NE.dat";
+						sourceString = "./input/NE.pd.dat";
 						indexString = "./database/NE";
 					}else if(line.equalsIgnoreCase("e")){
 						sourceString = "./source/CA.dat";
@@ -114,11 +114,11 @@ public class knnwithcryop {
 						break;
 					}
 					System.out.println("building rtree of " + sourceString + " ...");
-					System.out.println("Input filename of Btree index:");
+					System.out.println("Input filename of index:");
 					String destFileName = in.nextLine();
 					
 					if(line.equalsIgnoreCase("a") || line.equalsIgnoreCase("b") || line.equalsIgnoreCase("c")){
-						rtree = RTree.createRTree(new String[] {sourceString, indexString, "100", "10nn", destFileName + ".PointsData", destFileName + ".LinesData.1HOP"});
+						rtree = RTree.createRTree(new String[] {sourceString, indexString, "100", "10nn", destFileName + ".dp", destFileName + ".dl"});
 						System.out.println("fin building rtree.");
 						System.out.println("building srtree...");
 						MyRtree[] myrtrees = new MyRtree[1];
@@ -131,7 +131,7 @@ public class knnwithcryop {
 						MyRtree[] myrtrees_kd = new MyRtree[1];
 						SecurityTree[] srtrees_kd = new SecurityTree[1];
 						System.out.println("building embeded kd rtree of " + sourceString + " ...");
-						rtree_kd = RTree.createRTree(new String[] {sourceString, indexString + "_kd", "100", "10nn", destFileName + ".PointsData", destFileName + ".LinesData.1HOP"});
+						rtree_kd = RTree.createRTree(new String[] {sourceString, indexString + "_kd", "100", "10nn", destFileName + ".dp", destFileName + ".dl"});
 						System.out.println("fin building embeded kd rtree.");
 						LoadMyRTree(indexString + "_kd", false, myrtrees_kd, srtrees_kd, true);
 						myrtree_kd = myrtrees_kd[0];

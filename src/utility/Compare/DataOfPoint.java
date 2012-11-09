@@ -167,7 +167,7 @@ public class DataOfPoint{
 	
 	public static void testReadFromFile() throws IOException{
 		ArrayList<long[]> testIndexs = new ArrayList<long[]>();
-		DataInputStream dis = new DataInputStream(new FileInputStream(new File("input/NE.dp.40.idx")));
+		DataInputStream dis = new DataInputStream(new FileInputStream(new File("input/NE.dp.idx")));
 		System.out.println("Read from file:");
 		long id, p, l;
 		while(dis.available() > 0){
@@ -175,11 +175,11 @@ public class DataOfPoint{
 			p = dis.readLong();
 			l = dis.readLong();
 			testIndexs.add(new long[]{id, p, l});
-			//System.out.println(id);
+			System.out.println(id);
 		}
 		dis.close();
 		System.out.println("Begin test:");
-		RandomAccessFile raf = new RandomAccessFile("input/NE.dp.40.dat", "r");
+		RandomAccessFile raf = new RandomAccessFile("input/NE.dp.dat", "r");
 		for(int i = 0; i < testIndexs.size(); i++){
 			long [] idx = testIndexs.get(i);
 			raf.seek(idx[1]);

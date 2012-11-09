@@ -328,7 +328,7 @@ public class RTree implements ISpatialIndex {
 				count++;
 				line = lr.readLine();
 			}
-
+//			System.out.println("Total id :\t" + id);
 			long end = System.currentTimeMillis();
 
 			println("Operations: " + count);
@@ -422,6 +422,7 @@ public class RTree implements ISpatialIndex {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		System.out.println("id :\t" + id);
 		DataOfPoint dataOfPoint = new DataOfPoint(data);
 		return dataOfPoint;
 	}
