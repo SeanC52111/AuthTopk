@@ -27,6 +27,7 @@ public class mergeIndexDP {
 	
 	public static boolean testIntegrity(String type, String filePath){
 		File[] files = new File(filePath).listFiles();
+		System.out.println("File Path:\t" + filePath);
 		for(int i = 0; i < machineList.length; i ++){
 			boolean found = false;
 			for(int j = 0; j < files.length; j++){
@@ -45,6 +46,7 @@ public class mergeIndexDP {
 		long pos = 0, cnt;
 		for(int i = 0; i < machineList.length; i++){
 			String fileName = filePath + "/" + type + "." + machineList[i] + ".idx";
+			System.out.println(fileName);
 			DataInputStream dis = new DataInputStream(new FileInputStream(new File(fileName)));
 			long id = 0, p, l, num = 0;
 			
@@ -57,6 +59,8 @@ public class mergeIndexDP {
 				dos.writeLong(l);
 				if(num == 0){
 					testIndexs.add(new long[]{id, pos, l});
+					//System.out.print(machineList[testIndexs.size() - 1] + ":\t");
+					//runTest(type, filePath, new long[]{id, p, l}, machineList[testIndexs.size() - 1]);
 				}
 				pos += l;
 				num ++;
@@ -65,10 +69,26 @@ public class mergeIndexDP {
 		}
 		dos.flush();
 		dos.close();
+		runTest(type, filePath);
+	}
+	
+	public static void runTest(String type, String filePath, long idx[], int machineId) throws IOException{
+		RandomAccessFile raf = new RandomAccessFile(filePath + "/" + type + "." + machineId + ".dat", "r");
+		raf.seek(idx[1]);
+		byte[] data = new byte[(int) idx[2]];
+		raf.read(data);
+		DataOfPoint dp = new DataOfPoint(data);
+		if(dp.getPointId() != idx[0]){
+			System.out.println("Fail");
+		}else{
+			System.out.println("Pass");
+		}
+		raf.close();
 	}
 	
 	public static void runTest(String type, String filePath) throws IOException{
 		RandomAccessFile raf = new RandomAccessFile(filePath + "/" + type + ".dat", "r");
+		System.out.println(filePath + "/" + type + ".dat");
 		for(int i = 0; i < testIndexs.size(); i++){
 			long [] idx = testIndexs.get(i);
 			raf.seek(idx[1]);
@@ -76,6 +96,8 @@ public class mergeIndexDP {
 			raf.read(data);
 			DataOfPoint dp = new DataOfPoint(data);
 			if(dp.getPointId() != idx[0]){
+				System.out.println(idx[0] + "\t" + idx[1] + "\t" + idx[2]);
+				System.out.println(dp.getPointId());
 				System.out.println("Fail in csr" + machineList[i]);
 			}else{
 				System.out.println("Pass in csr" + machineList[i]);
@@ -105,6 +127,8 @@ public class mergeIndexDP {
 		}
 		if(testIntegrity(type, filePath) == false){
 			System.out.println("Lack file!");
+		}else{
+			System.out.println("Complete index file!");
 		}
 		mergeFile(type, filePath);
 	}

@@ -4,7 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+
 import utility.security.DataIO;
 import utility.security.Gfunction;
 import utility.security.Point;
@@ -30,6 +37,7 @@ public class DataOfPoint{
 	}
 	
 	public DataOfPoint(int id, Point _p, Long[] _ids){
+		pid = id;
 		p = _p;
 		delaunayIds = _ids;
 		gf_x = new Gfunction(p.x, 16);
@@ -124,4 +132,67 @@ public class DataOfPoint{
 		signature = rsa.encrypt(getDigest());
 	}
 	
+	/**
+	 * This is for test.
+	 * @throws IOException 
+	 * */
+	public static void main(String[] args) throws IOException{
+		File file = new File("DataOfPoint.testfile");
+		DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+		Point p = new Point(6, 8, 10);
+		p.buildByPaillier();
+		DataOfPoint dp = new DataOfPoint(10, p, new Long[]{(long) 0, (long) 1, (long) 2});
+		byte[] data = dp.writeToBytes();
+		int len = data.length;
+		dos.write(data);
+		DataOfPoint dp2 = new DataOfPoint(12, p, new Long[]{(long) 0, (long) 2, (long) 3});
+		byte[] data2 = dp2.writeToBytes();
+		int len2 = data.length;
+		dos.write(data2);
+		dos.flush();
+		dos.close();
+		
+		RandomAccessFile raf = new RandomAccessFile(file, "r");
+		raf.seek(len);
+		data2 = new byte[len2];
+		raf.read(data2);
+		dp2 = new DataOfPoint(data2);
+//		System.out.println(dp2.getPointId());
+		raf.close();
+		
+		file.delete();
+		
+		testReadFromFile();
+	}
+	
+	public static void testReadFromFile() throws IOException{
+		ArrayList<long[]> testIndexs = new ArrayList<long[]>();
+		DataInputStream dis = new DataInputStream(new FileInputStream(new File("input/NE.dp.40.idx")));
+		System.out.println("Read from file:");
+		long id, p, l;
+		while(dis.available() > 0){
+			id = dis.readLong();
+			p = dis.readLong();
+			l = dis.readLong();
+			testIndexs.add(new long[]{id, p, l});
+			//System.out.println(id);
+		}
+		dis.close();
+		System.out.println("Begin test:");
+		RandomAccessFile raf = new RandomAccessFile("input/NE.dp.40.dat", "r");
+		for(int i = 0; i < testIndexs.size(); i++){
+			long [] idx = testIndexs.get(i);
+			raf.seek(idx[1]);
+			byte[] data = new byte[(int) idx[2]];
+			raf.read(data);
+			DataOfPoint dp = new DataOfPoint(data);
+			if(dp.getPointId() != idx[0]){
+				System.out.print("x");
+			}else{
+				System.out.print(".");
+			}
+			if(i % 100 == 99)System.out.println("");
+		}
+		raf.close();
+	}
 }

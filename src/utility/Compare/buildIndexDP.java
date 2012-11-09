@@ -83,7 +83,6 @@ public class buildIndexDP {
 		final int limit = toId; 
 		lock[0] = fromId;
 		w_lock[0] = 0;
-		dos_idx.writeInt(toId - fromId);
 		for(int id = 0; id < ThreadNum; id ++){
 			threadStatus[id] = false;
 			final int tid = id;

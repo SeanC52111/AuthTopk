@@ -1,7 +1,7 @@
 #!/bin/sh
 
- count=1336581
- #count=118804
+ #count=1336581
+ count=118804
 ((step=$count/28+1))
 
 j=0
@@ -13,7 +13,7 @@ do
 		to=$count
 	fi
 	((j++))
-	cmd="cd workspace/auth_of_knn; sh run.sh utility.Compare.buildIndexDP ./input/$1 /tmp/qchen/database/$2.$i $from $to 16"
+	cmd="cd ~/workspace/auth_of_knn; sh run.sh utility.Compare.buildIndexDP ./input/$1 /tmp/qchen/database/$2.$i $from $to 8"
 	echo $cmd
 	ssh csr$i $cmd &
 done
