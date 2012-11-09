@@ -111,19 +111,21 @@ public class VoronoiNeighbors {
 	}
 	
 	public void loadVoronoiNeighbors(String destFileName, HashMap<Integer, int[]> nbHashMap){
-		if(destFileName.endsWith(".nb") == false)destFileName += ".nb";
-		DataInputStream dis;
-		System.out.println("begin load");
+		Scanner in;
+		System.out.println("begin loading voronoi neighbors");
 		try {
-			dis = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(destFileName))));
-			int len = dis.readInt(), mod = len / 10;
-			for(int i = 0; i < len; i++){
-				if(i / mod != (i + 1) / mod)System.out.print(".");
-				int id = dis.readInt();
-				int[] pid = DataIO.readIntArrays(dis);
-				nbHashMap.put(id, pid);
+			in = new Scanner(new File(destFileName));
+			while(in.hasNext()){
+				String line = in.nextLine();
+				String[] tks = line.split("\t");
+				int key = Integer.parseInt(tks[0]);
+				int[] pids = new int[tks.length - 3];
+				for(int i = 3; i < tks.length; i++){
+					pids[i - 3] = Integer.parseInt(tks[i]);
+				}
+				nbHashMap.put(key, pids);
 			}
-			dis.close();
+			in.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

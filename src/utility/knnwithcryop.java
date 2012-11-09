@@ -142,10 +142,11 @@ public class knnwithcryop {
 			}else if(line.equalsIgnoreCase("c")){
 				while(true){
 					System.out.println("(a) load NE\n(b) load CA\n(c) load test\n(d) exit");
-					String filename = null;
+					String filename = null, nbFileName = null;
 					line = in.nextLine();
 					if(line.equalsIgnoreCase("a")){
 						filename = "./database/NE";
+						nbFileName = "./input/NE.pd.dat";
 					}else if(line.equalsIgnoreCase("b")){
 						filename = "./database/CA";
 					}else if(line.equalsIgnoreCase("c")){
@@ -166,7 +167,7 @@ public class knnwithcryop {
 					srtree_kd = srtrees_kd[0];
 					System.out.println("Load Successfully!");
 					VoronoiNeighbors vn = new VoronoiNeighbors();
-					vn.loadVoronoiNeighbors(filename, nbHashMap);
+					vn.loadVoronoiNeighbors(nbFileName, nbHashMap);
 					break;
 				}
 			}else if(line.equalsIgnoreCase("d")){
@@ -182,7 +183,7 @@ public class knnwithcryop {
 						String[] coords = in.nextLine().split(" ");
 						System.out.println("Please input the limit:");
 						int limit = Integer.parseInt(in.nextLine());
-						Point pt = new Point(new double[]{Double.parseDouble(coords[0]), Double.parseDouble(coords[1])});
+						Point pt = new Point(new double[]{Double.parseDouble(coords[0]), Double.parseDouble(coords[1]), 0});
 						query(kNum, pt, new PrintWriter(System.out), null, -1, limit);				
 					}else{
 						System.out.println("===========end query===========");
