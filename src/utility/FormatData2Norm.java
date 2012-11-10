@@ -19,10 +19,10 @@ import utility.geo.DataOfLine;
 public class FormatData2Norm {
 
 	public static int scale = 10000;
-	public static ArrayList<int[]> pointsAfter = null;
+	public static ArrayList<long[]> pointsAfter = null;
 	public static HashSet<Long> cnt = new HashSet<Long>();
 	
-	public static long getId(int id1, int id2){
+	public static long getId(long id1, long id2){
 		return id1 * DataOfLine.M + id2;
 	}
 
@@ -49,13 +49,13 @@ public class FormatData2Norm {
 			if(maxz < point[2]) maxz = point[2];
 		}
 		filein.close();
-		pointsAfter = new ArrayList<int[]>();
+		pointsAfter = new ArrayList<long[]>();
 		for(int i = 0; i < points.size(); i++){
 			double[] point = points.get(i);
-			int x = (int)(point[0] / (maxx - minx) * scale);
-			int y = (int)(point[1] / (maxy - miny) * scale);
-			int z = 0;
-			if(maxz == minz)z = (int)(point[2] / (maxz - minz) * scale);
+			long x = (long)(point[0] / (maxx - minx) * scale);
+			long y = (long)(point[1] / (maxy - miny) * scale);
+			long z = 0;
+			if(maxz != minz)z = (long)(point[2] / (maxz - minz) * scale);
 			long id = getId(x, y);
 			if(cnt.contains(id)){
 				continue;
@@ -63,14 +63,14 @@ public class FormatData2Norm {
 				cnt.add(id);
 			}
 			z += -(x * x + y * y);
-			pointsAfter.add(new int[]{x, y, z});
+			pointsAfter.add(new long[]{x, y, z});
 			//pw.println(x + "\t" + y);
 //			pw.println(x + "\t" + y + "\t" + z);
 		}
 		pw.println("3");
 		pw.println(pointsAfter.size());
 		for(int i = 0; i < pointsAfter.size(); i++){
-			int[] point = pointsAfter.get(i);
+			long[] point = pointsAfter.get(i);
 			pw.println(point[0] + "\t" + point[1] + "\t" + point[2]);
 		}
 		pw.flush();
