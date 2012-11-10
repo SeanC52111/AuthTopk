@@ -52,10 +52,10 @@ public class FormatData2Norm {
 		pointsAfter = new ArrayList<long[]>();
 		for(int i = 0; i < points.size(); i++){
 			double[] point = points.get(i);
-			long x = (long)(point[0] / (maxx - minx) * scale);
-			long y = (long)(point[1] / (maxy - miny) * scale);
+			long x = (long)((point[0] - minx) / (maxx - minx) * scale);
+			long y = (long)((point[1] - miny) / (maxy - miny) * scale);
 			long z = 0;
-			if(maxz != minz)z = (long)(point[2] / (maxz - minz) * scale);
+			if(maxz != minz)z = (long)((point[2] - minz) / (maxz - minz) * scale);
 			long id = getId(x, y);
 			if(cnt.contains(id)){
 				continue;
