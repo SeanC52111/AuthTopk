@@ -94,6 +94,7 @@ public class SecurityVisitor implements IVisitor {
 	@Override
 	public void visitData(IData d, int type) {
 		// TODO Auto-generated method stub
+//		System.out.println(d.getIdentifier());
 		dataState.put(d.getIdentifier(), type);
 	}
 

@@ -117,8 +117,9 @@ public class SeedsGenerater {
 	}
 	
 	public BigInteger Decompose2(BigInteger val){
-		System.out.println(val);
+//		System.out.println(val);
 		BigInteger ans = BigIntegerUtility.ONE;
+		if(val.signum() < 0)return ans;
 		for(int i = 0 ; i < seeds.length - 1; i ++){
 			//if(val.compareTo(seeds[i]) >= 0){
 				BigInteger exp = val.mod(BigInteger.valueOf(base));
@@ -126,6 +127,7 @@ public class SeedsGenerater {
 				val = val.divide(BigInteger.valueOf(base));
 			//}
 		}
+//		System.out.println("decrypt:\t" + rsa.decrypt(ans));
 		return ans;
 	}
 	

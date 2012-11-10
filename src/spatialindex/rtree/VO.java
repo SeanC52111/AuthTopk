@@ -46,7 +46,7 @@ public class VO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private int queryHits;
-	private boolean Debug = true;
+	private boolean Debug = false;
 	/**
 	 * use for counting in analyzing VO String
 	 */
@@ -83,6 +83,12 @@ public class VO implements Serializable {
 		Iterator<Integer> iter = dataState.keySet().iterator();
 		HashSet<Integer> neighborIds = new HashSet<Integer>();
 		HashSet<Integer> neighborsOfp1 = new HashSet<Integer>();
+		
+		
+		
+		/**
+		 * Get neighbors of 1nn, and put points which are near than knn and farther than knn to corresponding arrays.
+		 * */
 		while(iter.hasNext()){
 			int key = iter.next();
 //			System.out.print(key + " ");
@@ -114,6 +120,10 @@ public class VO implements Serializable {
 				}
 			}
 		}
+		
+		/**
+		 * sort these points according to distance to query point.
+		 * */
 		//System.out.println("num of far points : " + fDataLen);
 		Arrays.sort(fDataList, 1, fDataLen, new Comparator<Integer>() {
 			@Override
@@ -142,6 +152,31 @@ public class VO implements Serializable {
 			}
 		});
 		fDataList[0] = dataList[0];
+		
+		
+		/**
+		 * check the datastate
+		 * */
+//		for(int i = 1; i < dataLen; i++){
+//			DataOfPoint dp1 = rtree.loadDataOfPointFromIndex(dataList[0]);
+//			DataOfPoint dp2 = rtree.loadDataOfPointFromIndex(dataList[i]);
+//			double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y, Math.sqrt(dp1.p.w)}));
+//			double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y, Math.sqrt(dp2.p.w)}));
+//			if(dist1 <= dist2){
+//				System.out.println("near error!");
+//			}
+//		}
+//		
+//		for(int i = 1; i < fDataLen; i++){
+//			DataOfPoint dp1 = rtree.loadDataOfPointFromIndex(dataList[0]);
+//			DataOfPoint dp2 = rtree.loadDataOfPointFromIndex(fDataList[i]);
+//			double dist1 = query.getMinimumDistance(new Point(new double[]{dp1.p.x, dp1.p.y, Math.sqrt(dp1.p.w)}));
+//			double dist2 = query.getMinimumDistance(new Point(new double[]{dp2.p.x, dp2.p.y, Math.sqrt(dp2.p.w)}));
+//			if(dist1 >= dist2){
+//				System.out.println("far error!!");
+//			}
+//		}
+		
 		if(Debug){
 			System.out.println(dataLen);
 			System.out.println(fDataLen);
@@ -164,6 +199,9 @@ public class VO implements Serializable {
 						dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
 						dccell.generateVeryfyPart((Point)query);
 						dcVO.add(dccell);
+//						if(dccell.verify((Point)query) == false){
+//							System.out.println("error");
+//						}
 						statForAuth.num_miss_1n ++;
 					}
 				}
@@ -189,6 +227,9 @@ public class VO implements Serializable {
 					dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
 					dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
+//					if(dccell.verify((Point)query) == false){
+//						System.out.println("error");
+//					}
 					statForAuth.num_miss_near ++;
 				}
 			}
@@ -217,6 +258,9 @@ public class VO implements Serializable {
 					dcCell dccell = new dcCell(dataVO.get(fDataList[0]).dataOfPoint.p, dataVO.get(pi).dataOfPoint.p);
 					dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
+//					if(dccell.verify((Point)query) == false){
+//						System.out.println("error");
+//					}
 					statForAuth.num_miss_far ++;
 				}
 			}
@@ -305,6 +349,9 @@ public class VO implements Serializable {
 		computeDataIo();
 	}
 	
+	/**
+	 * Judge id is in limit hop of p.
+	 * */
 	public boolean computePos(int limit, DataOfPoint p, int id){
 		if(p == null)return false;
 		for(int i = 0; i < p.delaunayIds.length && limit != 0; i++){
@@ -313,6 +360,10 @@ public class VO implements Serializable {
 		return false;
 	}
 	
+	/**
+	 * judge uid and vid are in hop of limit
+	 * 
+	 * */
 	public boolean computePos(int limit, int uid, int vid){
 		Queue<Integer> q = new LinkedList<Integer>();
 		HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>();
@@ -416,7 +467,7 @@ public class VO implements Serializable {
 					continue;
 				}
 				boolean found = false;
-				for(int j = 0; j < i; j++){//Dist(j, k) >= Dist(i, k)
+				for(int j = 0; j < i; j++){//Dist(j, q) >= Dist(i, q)
 					StateCell cellj = dataList[j];
 					DataOfLine dataofline = null;
 					dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellj.getId());
@@ -682,6 +733,7 @@ public class VO implements Serializable {
 				ans += dcVO.get(i).getVOSize();
 			}
 			for(int i = 0; i < lineVO.size(); i++){
+//				System.out.print(i + "\t");
 				ans += lineVO.get(i).getVOSize();
 			}
 			for(int i = 0; i < gfVO.size(); i++){
@@ -813,15 +865,22 @@ public class VO implements Serializable {
 		long start = bean.getCurrentThreadCpuTime(), end;
 		if(type_VO == 0){			
 			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query))return false;
+				if(!dcVO.get(i).verify(query)){
+//					System.out.println(i + "\t:fail");
+					return false;
+				}
 			}
 			//System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query))return false;
+				if(!lineVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query))return false;
+				if(!gfVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass gf!");
 //			String rootDigest = reConstruct(rtree.m_rootID);
@@ -837,11 +896,15 @@ public class VO implements Serializable {
 			ArrayList<String> digests = new ArrayList<String>();
 			for(int i = 0; i < dcVO.size(); i++){
 				//System.out.println(i);
-				if(!dcVO.get(i).verify(query))return false;
+				if(!dcVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query))return false;
+				if(!lineVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass line!");
 			
@@ -858,15 +921,21 @@ public class VO implements Serializable {
 			}
 		}else{//kd tree embeded
 			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query))return false;
+				if(!dcVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query))return false;
+				if(!lineVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query))return false;
+				if(!gfVO.get(i).verify(query)){
+					return false;
+				}
 			}
 //			System.out.println("Pass gf!");
 			try {
@@ -1049,9 +1118,11 @@ public class VO implements Serializable {
 			line = dataOfLine.line;
 			signature = dataOfLine.signature;
 		}
+		
 		public void generateVeryfyPart(Point q){
 			line.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0), true); // here may need further check, about 'true'
 		}
+		
 		public boolean verify(Point q){
 			return line.ClientVerify(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0));
 		}

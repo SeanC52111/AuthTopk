@@ -94,12 +94,14 @@ public class BuildRTreeStrategy implements IQueryStrategy {
 			double ans = 0.0;
 			double x1 = region.getLow(0);
 			double y1 = region.getLow(1);
+			double z1 = region.getLow(2);
 			double x2 = region.getHigh(0);
 			double y2 = region.getHigh(1);
-			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x1, y1})));
-			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x1, y2})));
-			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x2, y1})));
-			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x2, y2})));
+			double z2 = region.getHigh(2);
+			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x1, y1, z2})));
+			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x1, y2, z2})));
+			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x2, y1, z2})));
+			ans = Math.max(ans, query.getMinimumDistance(new Point(new double[] {x2, y2, z2})));
 			return ans;
 		}
 	}

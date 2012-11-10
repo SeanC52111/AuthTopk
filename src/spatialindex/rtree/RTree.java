@@ -236,6 +236,7 @@ public class RTree implements ISpatialIndex {
 //				y2 = new Double(st.nextToken()).doubleValue();
 
 				op = 1;
+				st.nextToken();
 				x1 = Double.parseDouble(st.nextToken());
 				y1 = Double.parseDouble(st.nextToken());
 				z1 = Double.parseDouble(st.nextToken());
@@ -389,6 +390,8 @@ public class RTree implements ISpatialIndex {
 		try {
 			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(destFileNameLine + ".idx"))));
 			rafLine = new RandomAccessFile(destFileNameLine + ".dat", "r");
+			tOfLine = new HashMap<Long, long[]>();
+			System.out.println("Load line index:\t" + destFileNameLine);
 			while(dis.available() > 0){
 				tOfLine.put(dis.readLong(), new long[]{dis.readLong(), dis.readLong()});
 			}
@@ -429,11 +432,12 @@ public class RTree implements ISpatialIndex {
 	
 	public DataOfLine loadDataOfLineFromIndex(long id1, long id2){
 		long id = DataOfLine.calcLineId(id1, id2);
-		if(tOfLine == null || !tOfLine.containsKey(id)){
+		if(tOfLine == null){
 			loadIndexOfLines();
 		}
 		if(tOfLine.containsKey(id) == false){
-			System.err.println("Not found line:\t" + id1 + ", " + id2);
+			//System.err.println("Not found line:\t" + id1 + ", " + id2);
+//			System.out.print("x");
 			return null;
 		}
 		long[] tmp = tOfLine.get(id);
@@ -452,11 +456,12 @@ public class RTree implements ISpatialIndex {
 	
 	public DataOfLine loadDataOfLineFromBtree(int id1, int id2){
 		long id = DataOfLine.calcLineId(id1, id2);
-		if(tOfLine == null || !tOfLine.containsKey(id)){
+		if(tOfLine == null){
 			loadIndexOfLines();
 		}
 		if(tOfLine.containsKey(id) == false){
-			System.err.println("Not found line:\t" + id1 + ", " + id2);
+//			System.out.print("x");
+//			System.err.println("Not found line:\t" + id1 + ", " + id2);
 			return null;
 		}
 		long[] tmp = tOfLine.get(id);

@@ -90,6 +90,7 @@ public class Point {
 		this.g_p_x2 = p1.g_p_x2;
 		this.g_p_y2 = p2.g_p_y2;
 		this.g_a = p1.g_a;
+		this.g_p_w = p1.g_p_w;
 	}
 	
 	public Point doublePoint(){
@@ -136,7 +137,7 @@ public class Point {
 		BigInteger dis1 = new BigInteger(new Long(Point.Distance2(pH.x, pH.y, q_x, q_y) + pH.w).toString());
 		BigInteger dis2 = new BigInteger(new Long(Point.Distance2(pL.x, pL.y, q_x, q_y) + pL.w).toString());
 		//return seeds.Decompose2(dis1.subtract(dis2).multiply(a));
-//		System.out.println(dis1 + " " + dis2);
+		//System.out.println(dis1 + " " + dis2);
 		return seeds.Decompose2(dis1.subtract(dis2));
 	}
 	
@@ -164,7 +165,7 @@ public class Point {
 	
 	/**
 	 * verify by client a, b, q, distance_delta
-	 * dist(a, q) >= dist(b, q)
+	 * dist(a, q) <= dist(b, q)
 	 * */
 	public static boolean verifyByClient(Point a, Point b, Point q, BigInteger delta){
 		BigInteger b_q_x = BigInteger.valueOf(q.x), b_q_y = BigInteger.valueOf(q.y);
@@ -172,13 +173,14 @@ public class Point {
 		left = left.multiply(a.g_2p_y.modPow(b_q_y, pailliar.nsquare)).mod(pailliar.nsquare);
 		left = left.multiply(b.g_p_x2.multiply(b.g_p_y2).mod(pailliar.nsquare)).mod(pailliar.nsquare);
 		left = left.multiply(b.g_a.modPow(b_q_x.add(b_q_y).subtract(BigInteger.ONE), pailliar.nsquare)).mod(pailliar.nsquare);
-		left = left.multiply(a.g_p_w).mod(pailliar.nsquare);
+		left = left.multiply(b.g_p_w).mod(pailliar.nsquare);
+//		left = left.multiply(delta).mod(pailliar.nsquare);
 		BigInteger right = b.g_2p_x.modPow(b_q_x, pailliar.nsquare);
 		right = right.multiply(b.g_2p_y.modPow(b_q_y, pailliar.nsquare)).mod(pailliar.nsquare);
 		right = right.multiply(a.g_p_x2.multiply(a.g_p_y2).mod(pailliar.nsquare)).mod(pailliar.nsquare);
 		right = right.multiply(a.g_a.modPow(b_q_x.add(b_q_y).subtract(BigInteger.ONE), pailliar.nsquare)).mod(pailliar.nsquare);
+		right = right.multiply(a.g_p_w).mod(pailliar.nsquare);
 		right = right.multiply(delta).mod(pailliar.nsquare);
-		right = right.multiply(b.g_p_w).mod(pailliar.nsquare);
 		if(left.equals(right))return true;
 		return false;
 	}
@@ -330,7 +332,7 @@ public class Point {
 			System.err.println("Fail!");
 		}
 		
-		q = new Point(100, 100, 0);
+		q = new Point(100, 0, 0);
 		rsa_delta = buildDelta(a, b, q.x, q.y);//for server
 		//System.out.println(rsa.decrypt(rsa_delta));
 		if(verifyByClient(a, b, q, rsa.decrypt(rsa_delta))){
@@ -340,14 +342,16 @@ public class Point {
 		}
 		DataOutputStream dos;
 		try {
-			dos = new DataOutputStream(new FileOutputStream(new File("./tmp/point")));
+			File tmpFile = new File("./tmp/point");
+			dos = new DataOutputStream(new FileOutputStream(tmpFile));
 			a.writeToFile(dos);
 			b.writeToFile(dos);
 			dos.close();
-			DataInputStream dis = new DataInputStream(new FileInputStream(new File("./tmp/point")));
+			DataInputStream dis = new DataInputStream(new FileInputStream(tmpFile));
 			a.readFromFile(dis);
 			b.readFromFile(dis);
 			dis.close();
+			tmpFile.delete();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

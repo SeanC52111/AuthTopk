@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.math.BigInteger;
 
+import Math.MathUtility;
+
 import utility.security.IVo;
 import utility.security.Paillier;
 import utility.security.Point;
@@ -58,6 +60,15 @@ public class DistanceCompare implements IVo{
 			return true;
 		}else{
 			//System.err.println("Fail!");
+			System.out.println("L:\t" + pL.getX() + ", " + pL.getY() + ", " + pL.getW());
+			System.out.println("H:\t" + pH.getX() + ", " + pH.getY() + ", " + pH.getW());
+			System.out.println("Q:\t" + q_x + ", " + q_y);
+			System.out.println("Tdelta:\t" + (
+					MathUtility.getDistance2(new double[]{pH.getX(), pH.getY(), Math.sqrt(pH.getW())}, new double[]{q_x, q_y, 0}) 
+					- MathUtility.getDistance2(new double[]{pL.getX(), pL.getY(), Math.sqrt(pL.getW())}, new double[]{q_x, q_y, 0})
+					)
+				);
+			System.out.println("Cdelta:\t" + pailliar.Decryption(rsa.decrypt(rsa_delta)));
 			return false;
 		}
 	}
@@ -124,10 +135,10 @@ public class DistanceCompare implements IVo{
 		
 		/**
 		 * 
-		 * pass
+		 * fail
 		 * */
-		p2 = new Point(3, 1, 4);
 		p1 = new Point(1, 2, 6);
+		p2 = new Point(3, 1, 4);
 		q = new Point(4, 4, 0);
 		dc1 = new DistanceCompare(p1, p2);
 		dc1.GenerateVeryfyPart(q);

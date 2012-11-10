@@ -285,9 +285,9 @@ public class knnwithcryop {
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
 			vo = new VO(kNum, pt, true, myrtree, srtree, 0, svisitor.getDistance(), limit);			
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);
@@ -300,9 +300,9 @@ public class knnwithcryop {
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
 			vo = new VO(kNum, pt, false, myrtree, srtree, 0, svisitor.getDistance(), limit);
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);
@@ -317,9 +317,9 @@ public class knnwithcryop {
 			myrtree_kd.nearestNeighborQuery(kNum, pt, svisitor);
 			vo = new VO(kNum, pt, true, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit);
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);
@@ -332,9 +332,9 @@ public class knnwithcryop {
 			myrtree_kd.nearestNeighborQuery(kNum, pt, svisitor);
 			vo = new VO(kNum, pt, false, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit);
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);
@@ -350,9 +350,9 @@ public class knnwithcryop {
 			vo = new VO(kNum, pt, svisitor.dataState, true, myrtree, limit);
 			vo.getStatistics().num_dataio += e - s;
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);
@@ -367,9 +367,9 @@ public class knnwithcryop {
 			vo = new VO(kNum, pt, svisitor.dataState, false, myrtree, limit);
 			vo.getStatistics().num_dataio += e - s;
 			if(vo.verify(pt)){
-				//System.out.println("Pass!");
+				System.out.println("Pass!");
 			}else{
-				System.err.println("Fail!");
+				System.out.println("Fail!");
 			}
 			if(type == -1)vo.getStatistics().print();
 			vo.getStatistics().printtoffile(pw);

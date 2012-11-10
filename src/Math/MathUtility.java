@@ -33,6 +33,48 @@ public static double eps = 1e-6;
 	}
 	
 	/**
+	 * get Distance between points low and high.
+	 * */
+	public static double getDistance(double[] low, double[] high){
+		if(low.length != high.length){
+			throw new IllegalArgumentException("Point has different dimensions.");
+		}
+		double ans = 0;
+		for(int i = 0 ; i < low.length; i++){
+			ans += (high[i] - low[i]) * (high[i] - low[i]);
+		}
+		return Math.sqrt(ans);
+	}
+	
+	/**
+	 * get Distance between points low and high.
+	 * */
+	public static double getDistance2(double[] low, double[] high){
+		if(low.length != high.length){
+			throw new IllegalArgumentException("Point has different dimensions.");
+		}
+		double ans = 0;
+		for(int i = 0 ; i < low.length; i++){
+			ans += (high[i] - low[i]) * (high[i] - low[i]);
+		}
+		return ans;
+	}
+	
+	/**
+	 * get Distance between (x1, y1) and (x2, y2).
+	 * */
+	public static double getDistance(double x1, double y1, double x2, double y2){
+		return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	}
+	
+	/**
+	 * get squared Distance between (x1, y1) and (x2, y2).
+	 * */
+	public static double getDistance2(double x1, double y1, double x2, double y2){
+		return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+	}
+	
+	/**
 	 * Determinant
 	 * */
 	public static double Det(MathPoint a, MathPoint b, MathPoint c){

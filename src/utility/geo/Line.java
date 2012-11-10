@@ -158,9 +158,10 @@ public class Line implements IVo{
 					- MathUtility.Square(pL.getX()) - MathUtility.Square(pL.getY())
 					+ pH.getW() - pL.getW()) / 
 					(2 * Point.Distance2(pH, pL)));
-			MathPoint ol = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
-			MathPoint vertical = new MathPoint(pH.y - pL.y, pL.x - pH.x);
-			MathPoint oh = new MathPoint(MathPoint.add(ol, vertical));
+			o_pL = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
+			MathPoint vertical_mp = new MathPoint(pH.y - pL.y, pL.x - pH.x);
+			Point vertical = new Point(pH.y - pL.y, pL.x - pH.x, 0);
+			o_pH = new MathPoint(MathPoint.add(o_pL, vertical_mp));
 		}
 		
 		MathPoint oq = new MathPoint(Q.getX(), Q.getY());
@@ -169,8 +170,8 @@ public class Line implements IVo{
 		if(MathUtility.D(area) <= 0){
 			if(MathUtility.D(area) != 0){
 				if(isL != false){
-					System.err.println("Error side!");
-					return;
+//					System.err.println("Error side!");
+//					return;
 				}
 			}
 			long area2 = Point.Areax2(farR_pL, farR_pH, Q);
@@ -190,7 +191,8 @@ public class Line implements IVo{
 		}else{
 			if(MathUtility.D(area) != 0){
 				if(isL != true){
-					System.err.println("Error side!");
+//					System.err.println("Error side!");
+//					return;
 				}
 			}
 			long area2 = Point.Areax2(farL_pL, farL_pH, Q);
