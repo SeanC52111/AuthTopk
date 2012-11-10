@@ -24,7 +24,7 @@ import java.util.Scanner;
 public class newDelaunayParser {
 	
 	public static HashMap<Integer, HashSet<Integer>> pointsList = new HashMap<Integer, HashSet<Integer>>();
-	public static ArrayList<int[]> points = new ArrayList<int[]>();
+	public static ArrayList<long[]> points = new ArrayList<long[]>();
 	
 	public static void loadData(String fileInputPath) throws FileNotFoundException{
 		Scanner in = new Scanner(new BufferedInputStream(new FileInputStream(new File(fileInputPath + ".tmp"))));
@@ -51,14 +51,14 @@ public class newDelaunayParser {
 		}
 		in.close();
 		in = new Scanner(new BufferedInputStream(new FileInputStream(new File(fileInputPath + ".nm"))));
-		in.nextLine();
+		in.nextLine(); // read 3
 		len = Integer.parseInt(in.nextLine());
 		for(int i = 0; i < len; i++){
 			String[] tks = in.nextLine().split("\t");
-			int x = Integer.parseInt(tks[0]);
-			int y = Integer.parseInt(tks[1]);
-			int z = Integer.parseInt(tks[2]) + (x * x + y * y);
-			points.add(new int[]{x, y, z});
+			long x = Long.parseLong(tks[0]);
+			long y = Long.parseLong(tks[1]);
+			long z = Long.parseLong(tks[2]) + (x * x + y * y);
+			points.add(new long[]{x, y, z});
 		}
 		in.close();
 	}
@@ -68,7 +68,7 @@ public class newDelaunayParser {
 		for(int i = 0; i < points.size(); i++){
 			int curId = i;
 			pw.print(curId);
-			int[] point = points.get(i);
+			long[] point = points.get(i);
 			pw.print("\t" + point[0] + "\t" + point[1] + "\t" + point[2]);
 			if(pointsList.containsKey(curId) == false){
 				System.out.println("");
