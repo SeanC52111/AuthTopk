@@ -30,7 +30,7 @@ import utility.security.RSA;
 public class buildIndexDL {
 
 	
-	public static ArrayList<int[]> points = null;	
+	public static ArrayList<long[]> points = null;	
 	public static int ThreadNum = 8;
 	public static boolean[] threadStatus = new boolean[ThreadNum];
 	public static RSA rsa = new RSA(); // sign for every data of point.
@@ -40,7 +40,7 @@ public class buildIndexDL {
 	 * 
 	 * */
 	public static void loadData(String sourceFileName){
-		points = new ArrayList<int[]>();
+		points = new ArrayList<long[]>();
 		
 		try {
 			String line = null;
@@ -48,9 +48,9 @@ public class buildIndexDL {
 			try {
 				while((line = lr.readLine()) != null){
 					String[] tks = line.split("\t");
-					int[] point = new int[tks.length - 1];
+					long[] point = new long[tks.length - 1];
 					for(int i = 1; i < tks.length; i++){
-						point[i - 1] = Integer.parseInt(tks[i]);
+						point[i - 1] = Long.parseLong(tks[i]);
 					}
 					points.add(point);
 					//if(DEBUG) System.err.println();
@@ -96,14 +96,14 @@ public class buildIndexDL {
 						if(curId >= limit)break;
 						if(curId % 2000 == 0)System.out.println("Thread:\t" + threadId + "\tid:\t" + curId);
 						ArrayList<Long> tmp = new ArrayList<Long>();
-						int[] point = points.get(curId);
+						long[] point = points.get(curId);
 						Point pPoint = new Point(point[0], point[1], point[2]);
 						ArrayList<DataOfLine> dls = new ArrayList<DataOfLine>();
 						for(int j = 3; j < point.length; j++){
-							int id1 = curId, id2 = point[j];
+							int id1 = curId, id2 = (int)point[j];
 							if(id1 >= id2)continue;
 							Long lineId = DataOfLine.calcLineId(id1, id2);
-							int[] point2 = points.get(id2);
+							long[] point2 = points.get(id2);
 							Line nline = new Line(point[0], point[1], point[2], point2[0], point2[1], point2[2]);
 							DataOfLine nDataOfLine = new DataOfLine(lineId, nline);
 							nDataOfLine.signWithRSA(rsa);

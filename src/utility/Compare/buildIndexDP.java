@@ -34,7 +34,7 @@ import mesh.PDelaunay;
  */
 public class buildIndexDP {
 
-	public static ArrayList<int[]> points = null;
+	public static ArrayList<long[]> points = null;
 	public static int ThreadNum = 16;
 	public static boolean[] threadStatus = new boolean[ThreadNum];
 	public static RSA rsa = new RSA(); // sign for every data of point.
@@ -44,7 +44,7 @@ public class buildIndexDP {
 	 * 
 	 * */
 	public static void loadData(String sourceFileName){
-		points = new ArrayList<int[]>();
+		points = new ArrayList<long[]>();
 		
 		try {
 			String line = null;
@@ -52,9 +52,9 @@ public class buildIndexDP {
 			try {
 				while((line = lr.readLine()) != null){
 					String[] tks = line.split("\t");
-					int[] point = new int[tks.length - 1];
+					long[] point = new long[tks.length - 1];
 					for(int i = 1; i < tks.length; i++){
-						point[i - 1] = Integer.parseInt(tks[i]);
+						point[i - 1] = Long.parseLong(tks[i]);
 					}
 					points.add(point);
 					//if(DEBUG) System.err.println();
@@ -101,10 +101,10 @@ public class buildIndexDP {
 						if(curId >= limit)break;
 						if(curId % 2000 == 0)System.out.println("Thread:\t" + threadId + "\tid:\t" + curId);
 						ArrayList<Long> tmp = new ArrayList<Long>();
-						int[] point = points.get(curId);
+						long[] point = points.get(curId);
 						Point pPoint = new Point(point[0], point[1], point[2]);
 						for(int j = 3; j < point.length; j++){
-							tmp.add((long)point[j]);
+							tmp.add(point[j]);
 //							System.out.print(tmp + "\t");
 						}
 //						System.out.println("");
