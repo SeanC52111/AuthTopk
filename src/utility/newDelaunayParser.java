@@ -71,7 +71,7 @@ public class newDelaunayParser {
 			long[] point = points.get(i);
 			pw.print("\t" + point[0] + "\t" + point[1] + "\t" + point[2]);
 			if(pointsList.containsKey(curId) == false){
-				System.out.println("");
+				pw.println("");
 				continue;
 			}
 			HashSet<Integer> ids = pointsList.get(curId);

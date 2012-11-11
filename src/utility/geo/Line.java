@@ -133,7 +133,7 @@ public class Line implements IVo{
 			}
 		}
 		
-		System.out.println(min + " " + min.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue() + " " + max + " " + max.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue());
+//		System.out.println(min + " " + min.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue() + " " + max + " " + max.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue());
 		gf = new Gfunction(0, 16, min.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue(), max.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue());
 		init_paillier();
 	}

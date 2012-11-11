@@ -3,6 +3,8 @@
  */
 package Math;
 
+import java.math.BigDecimal;
+
 /**
  * @author chenqian
  *
@@ -20,7 +22,7 @@ public static double eps = 1e-6;
 	public static double Square(double x){
 		return x * x;
 	}
-
+	
 	/**
 	 * D(x) < 0, x < 0
 	 * D(x) == 0, x == 0

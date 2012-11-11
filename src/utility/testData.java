@@ -34,7 +34,7 @@ public class testData extends JFrame {
 	public static final int DEFAULT_HEIGHT = 600;// default windows height
 	public static final int DEFAULT_LOCATION_X = 150; // default windows initial location x
 	public static final int DEFAULT_LOCATION_Y = 150;//default windows initial location y
-	private String filename = "source/CA.dat";
+	private String filename = "input/GO1.0.in";
 	private String fileofquery = "query/query.in.1000";
 	/**
 	 * @param args
@@ -81,10 +81,11 @@ public class testData extends JFrame {
 			int sx = 1 << 20, sy = 1 << 20, mx = -1, my = -1;
 			try {
 				Scanner in = new Scanner(new FileInputStream(new File(filename)));
+				in.nextInt();// eat 3
+				in.nextInt();//eat number
 				while(in.hasNext()){
-					in.nextInt(); in.nextInt();
-					in.nextInt(); in.nextInt();
 					int x1 = in.nextInt(), y1 = in.nextInt();
+					in.nextLong();
 					if(x1 > mx) mx = x1;
 					if(x1 < sx) sx = x1;
 					if(y1 > my) my = y1;
@@ -93,10 +94,11 @@ public class testData extends JFrame {
 				in.close();
 				in = new Scanner(new FileInputStream(new File(filename)));
 				int rangex = mx - sx, rangey = my - sy;
+				in.nextInt();// eat 3
+				in.nextInt();//eat number
 				while(in.hasNext()){
-					in.nextInt(); in.nextInt();
-					in.nextInt(); in.nextInt();
 					int x1 = (int) (1.0 * (in.nextInt() - sx) / rangex * DEFAULT_WIDTH), y1 = (int) (1.0 * (in.nextInt()- sy) / rangey * DEFAULT_HEIGHT);
+					in.nextLong();
 					points.add(new Point(x1, y1));
 				}
 				in.close();
