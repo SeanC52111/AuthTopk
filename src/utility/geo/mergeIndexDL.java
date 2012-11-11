@@ -17,7 +17,7 @@ import utility.testData;
 
 public class mergeIndexDL {
 
-	static int[] machineList = {40, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69};
+	static int[] machineList = {40, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68};
 	static ArrayList<long[]> testIndexs = new ArrayList<long[]>();
 	public static boolean testIntegrity(String type, String filePath){
 		File[] files = new File(filePath).listFiles();
