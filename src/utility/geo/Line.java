@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.xml.crypto.Data;
 
+import Math.BigMathPoint;
+import Math.BigMathUtility;
 import Math.MathPoint;
 import Math.MathUtility;
 
@@ -27,7 +30,7 @@ import utility.security.SeedsGenerater;
 
 public class Line implements IVo{
 	Point pL, pH;
-	MathPoint o_pL, o_pH; 
+	BigMathPoint o_pL, o_pH; 
 	Point farL_pL, farL_pH;
 	Point farR_pL, farR_pH;
 	public static Paillier paillier = new Paillier(true);
@@ -79,40 +82,59 @@ public class Line implements IVo{
 		 * where x_i, x_j are points
 		 * 
 		 * */
-		double k = ((MathUtility.Square(pH.getX()) + MathUtility.Square(pH.getY()) 
-				- MathUtility.Square(pL.getX()) - MathUtility.Square(pL.getY())
-				+ pH.getW() - pL.getW()) / 
-				(2 * Point.Distance2(pH, pL)));
-		o_pL = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
-		MathPoint vertical_mp = new MathPoint(pH.y - pL.y, pL.x - pH.x);
+		BigMathPoint bpH = new BigMathPoint(new long[]{pH.getX(), pH.getY(), pH.getW()});
+		BigMathPoint bpL = new BigMathPoint(new long[]{pL.getX(), pL.getY(), pL.getW()});
+		
+		BigDecimal numerator = BigMathUtility.Square(bpH.getX()).add(
+							BigMathUtility.Square(bpH.getY())
+						).subtract(
+							BigMathUtility.Square(bpL.getX())
+						).subtract(
+							BigMathUtility.Square(bpL.getY())
+						).add(
+							bpH.getW()
+						).subtract(
+							bpL.getW()
+						);
+		BigDecimal denomintor = BigMathUtility.getDistance2in2d(bpL, bpH).multiply(new BigDecimal("2"));
+		BigDecimal k = numerator.divide(denomintor, 0, BigDecimal.ROUND_HALF_EVEN);
+		o_pL = new BigMathPoint(
+				k.multiply(bpH.getX().subtract(bpL.getX())), 
+				k.multiply(bpH.getY().subtract(bpL.getY()))
+			);
+		BigMathPoint vertical_mp = new BigMathPoint(
+				bpH.getY().subtract(bpL.getY()), 
+				bpL.getX().subtract(bpH.getX())
+		);
 		Point vertical = new Point(pH.y - pL.y, pL.x - pH.x, 0);
-		o_pH = new MathPoint(MathPoint.add(o_pL, vertical_mp));
+		o_pH = new BigMathPoint(BigMathPoint.add(o_pL, vertical_mp));
 		
 		Point[] far_pL = new Point[4], far_pH = new Point[4];
-		double[] area = new double[4];
-		far_pL[0] = new Point(-(1 << 15), -(1 << 15), 0);
-		far_pL[1] = new Point((1 << 15) - 1, -(1 << 15), 0);
-		far_pL[2] = new Point(-(1 << 15), (1 << 15) - 1, 0);
-		far_pL[3] = new Point((1 << 15) - 1, (1 << 15) - 1, 0);
-		double min = 1e60, max = -1e60;
+		far_pL[0] = new Point(-(1 << 25), -(1 << 25), 0);
+		far_pL[1] = new Point((1 << 25) - 1, -(1 << 25), 0);
+		far_pL[2] = new Point(-(1 << 25), (1 << 25) - 1, 0);
+		far_pL[3] = new Point((1 << 25) - 1, (1 << 25) - 1, 0);
+		BigDecimal[] area = new BigDecimal[4];
+		BigDecimal min = new BigDecimal("1e60"), max = new BigDecimal("-1e60");
 		for(int i = 0; i < 4; i++ ){
 			far_pH[i] = new Point(far_pL[i]);
 			far_pH[i].Add(vertical);
-			area[i] = MathUtility.Det(o_pL,new MathPoint(far_pL[i].getX(), far_pL[i].getY()), 
-					new MathPoint(far_pH[i].getX(), far_pH[i].getY()));
-			if(min > area[i]){
+			area[i] = BigMathUtility.Det(o_pL, new BigMathPoint(far_pL[i].getX(), far_pL[i].getY()), 
+					new BigMathPoint(far_pH[i].getX(), far_pH[i].getY()));
+			if(min.compareTo(area[i]) > 0){
 				farL_pL = far_pL[i];
 				farL_pH = far_pH[i];
 				min = area[i];
 			}
-			if(max < area[i]){
+			if(max.compareTo(area[i]) < 0){
 				farR_pL = far_pL[i];
 				farR_pH = far_pH[i];
 				max = area[i];
 			}
 		}
-//		System.out.println(min + " " + (long)MathUtility.getApproximate(min) + " " + max + " " + (long)MathUtility.getApproximate(max));
-		gf = new Gfunction(0, 16, (long)MathUtility.getApproximate(min), (long)MathUtility.getApproximate(max));
+		
+		System.out.println(min + " " + min.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue() + " " + max + " " + max.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue());
+		gf = new Gfunction(0, 16, min.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue(), max.setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue());
 		init_paillier();
 	}
 	
@@ -154,30 +176,49 @@ public class Line implements IVo{
 	public void GenerateVeryfyPart(Point Q, boolean isL){
 		Q = Q.doublePoint();
 		if(o_pL == null || o_pH == null){
-			double k = ((MathUtility.Square(pH.getX()) + MathUtility.Square(pH.getY()) 
-					- MathUtility.Square(pL.getX()) - MathUtility.Square(pL.getY())
-					+ pH.getW() - pL.getW()) / 
-					(2 * Point.Distance2(pH, pL)));
-			o_pL = new MathPoint(k * (pH.getX() - pL.getX()), k * (pH.getY() - pL.getY()) );
-			MathPoint vertical_mp = new MathPoint(pH.y - pL.y, pL.x - pH.x);
+			BigMathPoint bpH = new BigMathPoint(new long[]{pH.getX(), pH.getY(), pH.getW()});
+			BigMathPoint bpL = new BigMathPoint(new long[]{pL.getX(), pL.getY(), pL.getW()});
+			
+			BigDecimal numerator = BigMathUtility.Square(bpH.getX()).add(
+								BigMathUtility.Square(bpH.getY())
+							).subtract(
+								BigMathUtility.Square(bpL.getX())
+							).subtract(
+								BigMathUtility.Square(bpL.getY())
+							).add(
+								bpH.getW()
+							).subtract(
+								bpL.getW()
+							);
+			BigDecimal denomintor = BigMathUtility.getDistance2in2d(bpL, bpH).multiply(new BigDecimal("2"));
+			BigDecimal k = numerator.divide(denomintor, 100, BigDecimal.ROUND_HALF_EVEN);
+			o_pL = new BigMathPoint(
+					k.multiply(bpH.getX().subtract(bpL.getX())), 
+					k.multiply(bpH.getY().subtract(bpL.getY()))
+				);
+			BigMathPoint vertical_mp = new BigMathPoint(
+					bpH.getY().subtract(bpL.getY()), 
+					bpL.getX().subtract(bpH.getX())
+			);
 			Point vertical = new Point(pH.y - pL.y, pL.x - pH.x, 0);
-			o_pH = new MathPoint(MathPoint.add(o_pL, vertical_mp));
+			o_pH = new BigMathPoint(BigMathPoint.add(o_pL, vertical_mp));
 		}
 		
 		MathPoint oq = new MathPoint(Q.getX(), Q.getY());
+		BigMathPoint boq = new BigMathPoint(Q.getX(), Q.getY());
 		//long area = Point.Areax2(o_pL, o_pH, Q);
-		double area = MathUtility.Det(oq, o_pL, o_pH);
-		if(MathUtility.D(area) <= 0){
-			if(MathUtility.D(area) != 0){
-				if(isL != false){
-//					System.err.println("Error side!");
-//					return;
-				}
-			}
+		BigDecimal area = BigMathUtility.Det(boq, o_pL, o_pH);
+		if(area.signum() < 0){
+//			if(MathUtility.D(area) != 0){
+//				if(isL != false){
+////					System.err.println("Error side!");
+////					return;
+//				}
+//			}
 			long area2 = Point.Areax2(farR_pL, farR_pH, Q);
 			areaRep = seeds.getRepresentation(area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart((long)MathUtility.getApproximate(- area), false);
+			ServerReturned = gf.GenerateVeryfyPart(area.negate().setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue(), false);
 //			try {
 //				if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, area2 - 1))){
 //					System.out.println("Pass!");
@@ -189,16 +230,16 @@ public class Line implements IVo{
 //				e.printStackTrace();
 //			}
 		}else{
-			if(MathUtility.D(area) != 0){
-				if(isL != true){
-//					System.err.println("Error side!");
-//					return;
-				}
-			}
+//			if(MathUtility.D(area) != 0){
+//				if(isL != true){
+////					System.err.println("Error side!");
+////					return;
+//				}
+//			}
 			long area2 = Point.Areax2(farL_pL, farL_pH, Q);
 			areaRep = seeds.getRepresentation(- area2, gf.m + 1);
 			baseRep = seeds.getRepresentationBase(gf.m + 1);
-			ServerReturned = gf.GenerateVeryfyPart((long)MathUtility.getApproximate(- area), true);	
+			ServerReturned = gf.GenerateVeryfyPart(area.negate().setScale(0, BigDecimal.ROUND_HALF_EVEN).longValue(), true);	
 //			try {
 //				if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, - area2 - 1))){
 //					System.out.println("Pass!");
