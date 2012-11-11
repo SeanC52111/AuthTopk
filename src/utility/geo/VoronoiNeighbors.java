@@ -120,8 +120,8 @@ public class VoronoiNeighbors {
 				String[] tks = line.split("\t");
 				int key = Integer.parseInt(tks[0]);
 				int[] pids = new int[tks.length - 3];
-				for(int i = 3; i < tks.length; i++){
-					pids[i - 3] = Integer.parseInt(tks[i]);
+				for(int i = 4; i < tks.length; i++){
+					pids[i - 4] = Integer.parseInt(tks[i]);
 				}
 				nbHashMap.put(key, pids);
 			}
