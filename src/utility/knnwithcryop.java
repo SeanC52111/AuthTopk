@@ -89,7 +89,7 @@ public class knnwithcryop {
 					 * d,e,f is for embedded ones.
 					 * 
 					 * */
-					System.out.println("(a) NE\n(b) CA\n(c) test\n(d) NE\n(e) CA\n(f) test\n(g) exit");
+					System.out.println("(a) NE\n(b) CA\n(c) GO\n(d) NE\n(e) CA\n(f) GO\n(g) exit");
 					line = in.nextLine();
 					String sourceString = null, indexString = null;
 					if(line.equalsIgnoreCase("a")){
@@ -99,8 +99,8 @@ public class knnwithcryop {
 						sourceString = "./source/CA.dat";
 						indexString = "./database/CA";
 					}else if(line.equalsIgnoreCase("c")){
-						sourceString = "./source/test.dat";
-						indexString = "./database/test";
+						sourceString = "./input/GO1.0.pd.dat";
+						indexString = "./database/GO1.0";
 					}else if(line.equalsIgnoreCase("d")){
 						sourceString = "./input/NE.pd.dat";
 						indexString = "./database/NE";
@@ -108,8 +108,8 @@ public class knnwithcryop {
 						sourceString = "./source/CA.dat";
 						indexString = "./database/CA";
 					}else if(line.equalsIgnoreCase("f")){
-						sourceString = "./source/test.dat";
-						indexString = "./database/test";
+						sourceString = "./input/GO1.0.pd.dat";
+						indexString = "./database/GO1.0";
 					}else{
 						break;
 					}
@@ -141,7 +141,7 @@ public class knnwithcryop {
 				}
 			}else if(line.equalsIgnoreCase("c")){
 				while(true){
-					System.out.println("(a) load NE\n(b) load CA\n(c) load test\n(d) exit");
+					System.out.println("(a) load NE\n(b) load CA\n(c) load GO\n(d) exit");
 					String filename = null, nbFileName = null;
 					line = in.nextLine();
 					if(line.equalsIgnoreCase("a")){
@@ -150,7 +150,8 @@ public class knnwithcryop {
 					}else if(line.equalsIgnoreCase("b")){
 						filename = "./database/CA";
 					}else if(line.equalsIgnoreCase("c")){
-						filename = "./database/test";
+						filename = "./database/GO1.0";
+						nbFileName = "./input/GO1.0.pd.dat";
 					}else{
 						break;
 					}

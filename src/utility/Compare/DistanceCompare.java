@@ -12,6 +12,7 @@ import utility.security.Point;
 import utility.security.RSA;
 
 public class DistanceCompare implements IVo{
+	boolean runTest = true;
 	public Point pL, pH;
 	public BigInteger rsa_delta;
 	public static Paillier pailliar = new Paillier(true);
@@ -60,15 +61,17 @@ public class DistanceCompare implements IVo{
 			return true;
 		}else{
 			//System.err.println("Fail!");
-			System.out.println("L:\t" + pL.getX() + ", " + pL.getY() + ", " + pL.getW());
-			System.out.println("H:\t" + pH.getX() + ", " + pH.getY() + ", " + pH.getW());
-			System.out.println("Q:\t" + q_x + ", " + q_y);
-			System.out.println("Tdelta:\t" + (
-					MathUtility.getDistance2(new double[]{pH.getX(), pH.getY(), Math.sqrt(pH.getW())}, new double[]{q_x, q_y, 0}) 
-					- MathUtility.getDistance2(new double[]{pL.getX(), pL.getY(), Math.sqrt(pL.getW())}, new double[]{q_x, q_y, 0})
-					)
-				);
-			System.out.println("Cdelta:\t" + pailliar.Decryption(rsa.decrypt(rsa_delta)));
+			if(!runTest){
+				System.out.println("L:\t" + pL.getX() + ", " + pL.getY() + ", " + pL.getW());
+				System.out.println("H:\t" + pH.getX() + ", " + pH.getY() + ", " + pH.getW());
+				System.out.println("Q:\t" + q_x + ", " + q_y);
+				System.out.println("Tdelta:\t" + (
+						MathUtility.getDistance2(new double[]{pH.getX(), pH.getY(), Math.sqrt(pH.getW())}, new double[]{q_x, q_y, 0}) 
+						- MathUtility.getDistance2(new double[]{pL.getX(), pL.getY(), Math.sqrt(pL.getW())}, new double[]{q_x, q_y, 0})
+						)
+						);
+				System.out.println("Cdelta:\t" + pailliar.Decryption(rsa.decrypt(rsa_delta)));
+			}
 			return false;
 		}
 	}

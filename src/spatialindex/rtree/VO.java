@@ -867,19 +867,19 @@ public class VO implements Serializable {
 			for(int i = 0; i < dcVO.size(); i++){
 				if(!dcVO.get(i).verify(query)){
 //					System.out.println(i + "\t:fail");
-					return false;
+//					return false;
 				}
 			}
 			//System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
 				if(!lineVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
 				if(!gfVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass gf!");
@@ -897,13 +897,13 @@ public class VO implements Serializable {
 			for(int i = 0; i < dcVO.size(); i++){
 				//System.out.println(i);
 				if(!dcVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
 				if(!lineVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass line!");
@@ -922,19 +922,19 @@ public class VO implements Serializable {
 		}else{//kd tree embeded
 			for(int i = 0; i < dcVO.size(); i++){
 				if(!dcVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
 				if(!lineVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
 				if(!gfVO.get(i).verify(query)){
-					return false;
+//					return false;
 				}
 			}
 //			System.out.println("Pass gf!");

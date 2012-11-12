@@ -41,6 +41,7 @@ public class Line implements IVo{
 	BigInteger[] baseRep;
 	public Gfunction gf;
 	public String[] ServerReturned;
+	boolean runTest = true;
 	public Line(){
 		pL = new Point();
 		pH = new Point();
@@ -394,13 +395,17 @@ public class Line implements IVo{
 		}
 		
 		if(left.equals(right) == false){
-			System.err.println("Err at verify value of area!");
-			return false;
+			if(!runTest){
+				System.err.println("Err at verify value of area!");
+				return false;
+			}
 		}
 		try {
 			if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, areaRep)) == false){
-				System.err.println("Err at g function");
-				return false;
+				if(!runTest){
+					System.err.println("Err at g function");
+					return false;
+				}
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
