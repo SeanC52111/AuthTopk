@@ -64,6 +64,7 @@ public class VerifyIndex {
 			if(dataOfPoint.getPointId() != key){
 				System.out.println("Error:\t" + key + ", " + dataOfPoint.getPointId());
 			}
+			System.out.print(dataOfPoint.p.getW());
 			if(lineid % 999 == 0)System.out.print(".");
 			if(lineid % 99999 == 0)System.out.println("");
 			lineid ++;

@@ -162,7 +162,7 @@ public class DataOfPoint{
 		
 		file.delete();
 		
-		testReadFromFile();
+//		testReadFromFile();
 	}
 	
 	public static void testReadFromFile() throws IOException{

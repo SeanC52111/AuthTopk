@@ -85,6 +85,7 @@ public class Point {
 	public Point(Point p1, Point p2){
 		this.x = p1.x;
 		this.y = p2.y;	
+		this.w = p1.w;
 		this.g_2p_x = p1.g_2p_x;
 		this.g_2p_y = p2.g_2p_y;
 		this.g_p_x2 = p1.g_p_x2;
@@ -205,6 +206,7 @@ public class Point {
 		try {
 			x = dis.readLong();
 			y = dis.readLong();
+			w = dis.readLong();
 			g_p_x2 = DataIO.readBigInteger(dis);
 			g_p_y2 = DataIO.readBigInteger(dis);
 			g_2p_x = DataIO.readBigInteger(dis);
@@ -222,6 +224,7 @@ public class Point {
 		try {
 			dos.writeLong(x);
 			dos.writeLong(y);
+			dos.writeLong(w);
 			DataIO.writeBigInteger(dos, g_p_x2);
 			DataIO.writeBigInteger(dos, g_p_y2);
 			DataIO.writeBigInteger(dos, g_2p_x);
