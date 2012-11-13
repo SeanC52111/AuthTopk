@@ -34,8 +34,8 @@ public class testData extends JFrame {
 	public static final int DEFAULT_HEIGHT = 600;// default windows height
 	public static final int DEFAULT_LOCATION_X = 150; // default windows initial location x
 	public static final int DEFAULT_LOCATION_Y = 150;//default windows initial location y
-	private String filename = "input/GO1.0.in";
-	private String fileofquery = "query/query.in.1000";
+	private String filename = "input/GO0.1.nm";
+	private String fileofquery = "query/query.in.4";
 	/**
 	 * @param args
 	 */

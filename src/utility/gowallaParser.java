@@ -35,8 +35,8 @@ public class gowallaParser {
 	public static String fileInputPath = "source/GO.dat";
 	
 	public static long getId(long id1, long id2, long id3){
-//		return id1 * DataOfLine.M * DataOfLine.M + id2 * DataOfLine.M + id3;
-		return id1 * DataOfLine.M + id2;
+		return id1 * DataOfLine.M * DataOfLine.M + id2 * DataOfLine.M + id3;
+//		return id1 * DataOfLine.M + id2;
 	}
 	
 	public static void loadData(String fileInputPath) throws FileNotFoundException{
@@ -78,10 +78,17 @@ public class gowallaParser {
 			if(maxz < point[2]) maxz = point[2];
 			points.add(point);
 		}
+		double tminx = minx, tmaxx = maxx, tminy = miny, tmaxy = maxy;
+		minx = (tmaxx - tminx) * 0.22 + minx;
+		maxx = (tmaxx - tminx) * 0.36  + minx;
+		miny = (tmaxy - tminy) * 0.125 + miny;
+		maxy = (tmaxy - tminy) * 0.5 + miny;
 		ArrayList<long[]> pointsAfter = new ArrayList<long[]>();
-		PrintWriter pw = new PrintWriter(new File(destFileName + rate + ".in"));
+		PrintWriter pw = new PrintWriter(new File(destFileName + rate + ".nm"));
 		for(int i = 0; i < points.size(); i++){
 			double[] point = points.get(i);
+			if(point[0] > maxx || point[0] < minx)continue;
+			if(point[1] > maxy || point[1] < miny)continue;
 			long x = (long)((point[0] - minx)/ (maxx - minx) * FormatData2Norm.scale);
 			long y = (long)((point[1] - miny) / (maxy - miny) * FormatData2Norm.scale);
 			long z = (long)0;

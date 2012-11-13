@@ -99,8 +99,10 @@ public class knnwithcryop {
 						sourceString = "./source/CA.dat";
 						indexString = "./database/CA";
 					}else if(line.equalsIgnoreCase("c")){
-						sourceString = "./input/GO1.0.pd.dat";
-						indexString = "./database/GO1.0";
+						System.out.println("Input the rate:");
+						String rate = in.nextLine();
+						sourceString = "./input/GO" + rate + ".pd.dat";
+						indexString = "./database/GO" + rate;
 					}else if(line.equalsIgnoreCase("d")){
 						sourceString = "./input/NE.pd.dat";
 						indexString = "./database/NE";
@@ -108,8 +110,10 @@ public class knnwithcryop {
 						sourceString = "./source/CA.dat";
 						indexString = "./database/CA";
 					}else if(line.equalsIgnoreCase("f")){
-						sourceString = "./input/GO1.0.pd.dat";
-						indexString = "./database/GO1.0";
+						System.out.println("Input the rate:");
+						String rate = in.nextLine();
+						sourceString = "./input/GO" + rate + ".pd.dat";
+						indexString = "./database/GO" + rate;
 					}else{
 						break;
 					}
@@ -150,8 +154,10 @@ public class knnwithcryop {
 					}else if(line.equalsIgnoreCase("b")){
 						filename = "./database/CA";
 					}else if(line.equalsIgnoreCase("c")){
-						filename = "./database/GO1.0";
-						nbFileName = "./input/GO1.0.pd.dat";
+						System.out.println("Input the rate:");
+						String rate = in.nextLine();
+						filename = "./database/GO" + rate;
+						nbFileName = "./input/GO" + rate + ".pd.dat";
 					}else{
 						break;
 					}

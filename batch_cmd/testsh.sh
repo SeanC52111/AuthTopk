@@ -1,6 +1,6 @@
 #!/bin/sh
 
-count=1796019
+count=433436
 ((step=$count/28+1))
 to=0;
 echo $to;

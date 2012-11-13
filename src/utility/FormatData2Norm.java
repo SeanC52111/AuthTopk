@@ -18,7 +18,7 @@ import utility.geo.DataOfLine;
  */
 public class FormatData2Norm {
 
-	public static int scale = 1000000;
+	public static int scale = 10000;
 	public static ArrayList<long[]> pointsAfter = null;
 	public static HashSet<Long> cnt = new HashSet<Long>();
 	
