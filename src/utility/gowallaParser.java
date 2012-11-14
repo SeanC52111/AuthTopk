@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 
+import Math.MathUtility;
+
 import utility.geo.DataOfLine;
 
 /**
@@ -83,6 +85,10 @@ public class gowallaParser {
 		maxx = (tmaxx - tminx) * 0.36  + minx;
 		miny = (tmaxy - tminy) * 0.125 + miny;
 		maxy = (tmaxy - tminy) * 0.5 + miny;
+//		minx = 30.75629467265251; miny = -117.68412699999999;
+//		maxx = 45.42058094907479; maxy = -66.99663100000009;
+		System.out.println("Coordinates bounds:\t" + minx + ", " + maxx + ", " + miny + ", " + maxy);
+		System.out.println("Distance:\t" + MathUtility.calculateDist(minx, miny, maxx, maxy));
 		ArrayList<long[]> pointsAfter = new ArrayList<long[]>();
 		PrintWriter pw = new PrintWriter(new File(destFileName + rate + ".nm"));
 		for(int i = 0; i < points.size(); i++){

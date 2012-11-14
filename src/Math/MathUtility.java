@@ -4,6 +4,7 @@
 package Math;
 
 import java.math.BigDecimal;
+import java.util.Scanner;
 
 /**
  * @author chenqian
@@ -13,6 +14,35 @@ public class MathUtility {
 
 public static double eps = 1e-6;
 	
+	/**
+	 * Calculate distance given lat, lng.
+	 * */
+	public static double calculateDist( double startLat, double startLng, double endLat, double endLng ){
+		/*double pi = atan2(1.0, 1.0) * 4;
+		//scale back to radians
+		double startLatInRadians = startLat*pi/180.0;
+		double endLatInRadians = endLat*pi/180.0;
+		double startLngInRadians = startLng*pi/180.0;
+		double endLngInRadians = endLng*pi/180.0;
+		double radians = acos(cos(startLatInRadians)*cos(startLngInRadians)*cos(endLatInRadians)*
+			cos(endLngInRadians) + cos(startLatInRadians)*sin(startLngInRadians)*
+			cos(endLatInRadians)*sin(endLngInRadians)+sin(startLatInRadians)*sin(endLatInRadians));
+	
+		//assume the radius of earth is 6372.8 km
+		double dist = 6372800.0 * radians;
+		gettimeofday(&eucEnd, 0);
+		tcalD += (double)(eucEnd.tv_sec - eucStart.tv_sec + (double)(eucEnd.tv_usec - eucStart.tv_usec) / CLOCKS_PER_SEC);
+	
+		return dist<0 ? -dist : dist;*/
+	
+		double ratio = 0.01745327; // pi/180 
+		double x = (endLng * ratio - startLng * ratio) * Math.cos((startLat * ratio + endLat * ratio) / 2);
+		double y = (endLat * ratio - startLat * ratio);
+		double circleDist = 6372800.0 * Math.sqrt( x * x + y * y );
+		//circleDist = circleDist<0 ? -circleDist : circleDist;
+		return circleDist;	
+	}
+
 	/**
 	 * 
 	 * get square
@@ -175,7 +205,11 @@ public static double eps = 1e-6;
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		Scanner in = new Scanner(System.in);
+		while(true){
+			double lat1 = in.nextDouble(), lng1 = in.nextDouble(), lat2 = in.nextDouble(), lng2 = in.nextDouble();
+			System.out.println(calculateDist(lat1, lng1, lat2, lng2));
+		}
 	}
 
 }
