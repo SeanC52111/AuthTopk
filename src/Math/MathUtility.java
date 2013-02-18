@@ -12,7 +12,7 @@ import java.util.Scanner;
  */
 public class MathUtility {
 
-public static double eps = 1e-6;
+public static double eps = 1e-8;
 	
 	/**
 	 * Calculate distance given lat, lng.
