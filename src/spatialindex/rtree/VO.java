@@ -68,6 +68,63 @@ public class VO implements Serializable {
 	public VO(){	
 	}
 	
+	void handleVOInParallel(final Point query, final int type){
+		final ArrayList<cell> vos = new ArrayList<VO.cell>();
+		for(int i = 0; i < dcVO.size(); i++){
+			vos.add(dcVO.get(i));
+		}
+		for(int i = 0; i < lineVO.size(); i++){
+			vos.add(lineVO.get(i));
+		}
+		for(int i = 0; i < gfVO.size(); i++){
+			vos.add(gfVO.get(i));
+		}
+		if(isParallel()){
+			final boolean[] threadStatus = new boolean[ThreadNum];
+			final int[] lock = new int[1];
+			//final int limit = vos.size();
+			lock[0] = 0;
+			for(int id = 0; id < ThreadNum; id ++){
+				threadStatus[id] = false;
+				final int tid = id;
+				new Thread(new Runnable() {
+					int threadId;
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						threadId = tid;
+						while(true){
+							int curid;
+							synchronized (lock) {
+								curid = lock[0];
+								lock[0] ++;
+							}
+							if(curid >= vos.size())break;
+							if(type == 0)vos.get(curid).verify(query);
+							else vos.get(curid).generateVeryfyPart(query);
+						}
+						threadStatus[threadId] = true;
+					}
+				}).start();
+			}
+			while(true){
+				boolean found = false;
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				for(int i = 0; i < ThreadNum; i++){
+					if(threadStatus[i] == false){
+						found = true;
+					}
+				}
+				if(!found)break;
+			}
+		}
+	}
+	
 	/**
 	 * For Voronoi Diagram
 	 * */
@@ -192,14 +249,14 @@ public class VO implements Serializable {
 					dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[dataLen - 1])){				
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 					}else if(lineVO.size() > 0 && computePos(limit, pi, dataList[dataLen - 1])){
 						lineVO.add(lineVO.get(0));
 						if(Debug)System.out.print(".");
 					}else{
 						dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
-						dccell.generateVeryfyPart((Point)query);
+						if(!isParallel())dccell.generateVeryfyPart((Point)query);
 						dcVO.add(dccell);
 //						if(dccell.verify((Point)query) == false){
 //							System.out.println("error");
@@ -214,7 +271,7 @@ public class VO implements Serializable {
 					dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, pj)){						
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 						found = true;
 						break;
@@ -227,7 +284,7 @@ public class VO implements Serializable {
 				}
 				if(found == false){
 					dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 //					if(dccell.verify((Point)query) == false){
 //						System.out.println("error");
@@ -245,7 +302,7 @@ public class VO implements Serializable {
 					dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, pj)){			
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 						found = true;
 						break;
@@ -258,7 +315,7 @@ public class VO implements Serializable {
 				}
 				if(found == false){
 					dcCell dccell = new dcCell(dataVO.get(fDataList[0]).dataOfPoint.p, dataVO.get(pi).dataOfPoint.p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 //					if(dccell.verify((Point)query) == false){
 //						System.out.println("error");
@@ -278,14 +335,14 @@ public class VO implements Serializable {
 					dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[dataLen - 1])){				
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 					}else if(lineVO.size() > 0 && computePos(limit, pi, dataList[dataLen - 1])){
 						lineVO.add(lineVO.get(0));
 						if(Debug)System.out.print(".");
 					}else{
 						dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
-						dccell.generateVeryfyPart((Point)query);
+						if(!isParallel())dccell.generateVeryfyPart((Point)query);
 						dcVO.add(dccell);
 						statForAuth.num_miss_1n ++;
 					}
@@ -294,14 +351,14 @@ public class VO implements Serializable {
 				dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
 				if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[0])){
 					lineCell linecell = new lineCell(dataofline);
-					linecell.generateVeryfyPart((Point)query);
+					if(!isParallel())linecell.generateVeryfyPart((Point)query);
 					lineVO.add(linecell);
 				}else if(lineVO.size() > 0 && computePos(limit, pi, dataList[0])){
 					lineVO.add(lineVO.get(0));
 					if(Debug)System.out.print(".");
 				}else{
 					dcCell dccell = new dcCell(dataVO.get(pi).dataOfPoint.p, dataVO.get(dataList[0]).dataOfPoint.p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 //					if(dccell.verify((Point)query) == false){
 //						System.err.println("Err res: " + pi);
 //					}
@@ -319,14 +376,14 @@ public class VO implements Serializable {
 				dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
 				if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[0])){
 					lineCell linecell = new lineCell(dataofline);
-					linecell.generateVeryfyPart((Point)query);
+					if(!isParallel())linecell.generateVeryfyPart((Point)query);
 					lineVO.add(linecell);
 				}else if(lineVO.size() > 0 && computePos(limit, pi, dataList[0])){
 					lineVO.add(lineVO.get(0));
 					if(Debug)System.out.print(".");
 				}else{
 					dcCell dccell = new dcCell(dataVO.get(fDataList[0]).dataOfPoint.p, dataVO.get(pi).dataOfPoint.p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 //					if(dccell.verify((Point)query) == false){
 //						dccell.dc.pL.print();
 //						dccell.dc.pH.print();
@@ -337,6 +394,7 @@ public class VO implements Serializable {
 				}
 			}
 		}
+		if(isParallel())handleVOInParallel((Point)query, 1);
 		ArrayList<String> sigs = new ArrayList<String>();
 		for(int i = 0; i < dataLen; i++){
 			sigs.add(dataVO.get(dataList[i]).dataOfPoint.getSignature());
@@ -480,7 +538,7 @@ public class VO implements Serializable {
 					}
 					if(dataofline != null && computePos(limit, dop, cellj.getId())){						
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 						found = true;
 						break;
@@ -500,7 +558,7 @@ public class VO implements Serializable {
 						p = nodeVO.get(celli.getId()).sPint;
 					}
 					dcCell dccell = new dcCell(p, qk);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 					statForAuth.num_miss_near ++;
 				}
@@ -529,7 +587,7 @@ public class VO implements Serializable {
 					}
 					if(dataofline != null && computePos(limit, dop, cellj.getId())){						
 						lineCell linecell = new lineCell(dataofline);
-						linecell.generateVeryfyPart((Point)query);
+						if(!isParallel())linecell.generateVeryfyPart((Point)query);
 						lineVO.add(linecell);
 						found = true;
 						break;
@@ -549,7 +607,7 @@ public class VO implements Serializable {
 						p = nodeVO.get(celli.getId()).sPint;
 					}
 					dcCell dccell = new dcCell(qk, p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 					statForAuth.num_miss_far ++;
 				}
@@ -584,7 +642,7 @@ public class VO implements Serializable {
 				}
 				if(dataofline != null && computePos(limit, dop, cellk.getId())){
 					lineCell linecell = new lineCell(dataofline);
-					linecell.generateVeryfyPart((Point)query);
+					if(!isParallel())linecell.generateVeryfyPart((Point)query);
 					lineVO.add(linecell);
 				}else if(isSigned(celli, cellk) && lineVO.size() > 0){
 					lineVO.add(lineVO.get(0));
@@ -597,7 +655,7 @@ public class VO implements Serializable {
 						p = nodeVO.get(celli.getId()).sPint;
 					}
 					dcCell dccell = new dcCell(p, qk);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 					statForAuth.num_miss_near ++;
 				}
@@ -623,7 +681,7 @@ public class VO implements Serializable {
 				}
 				if(dataofline != null && computePos(limit, dop, cellk.getId())){
 					lineCell linecell = new lineCell(dataofline);
-					linecell.generateVeryfyPart((Point)query);
+					if(!isParallel())linecell.generateVeryfyPart((Point)query);
 					lineVO.add(linecell);
 				}else if(isSigned(celli, cellk) && lineVO.size() > 0){
 						lineVO.add(lineVO.get(0));
@@ -636,12 +694,13 @@ public class VO implements Serializable {
 						p = nodeVO.get(celli.getId()).sPint;
 					}
 					dcCell dccell = new dcCell(qk, p);
-					dccell.generateVeryfyPart((Point)query);
+					if(!isParallel())dccell.generateVeryfyPart((Point)query);
 					dcVO.add(dccell);
 					statForAuth.num_miss_far ++;
 				}
 			}
 		}
+		if(isParallel())handleVOInParallel((Point)query, 1);
 		end = bean.getCurrentThreadCpuTime();
 		dioe = rtree.getStatistics().getReads();
 		statForAuth.con_time_SP += (end - start) / 1000000.0;
@@ -681,7 +740,7 @@ public class VO implements Serializable {
 		if(p.g_p_y2 == null){
 			p.setYSide(sP);
 		}
-		gfcell.generateVeryfyPart((Point)query);
+		if(!isParallel())gfcell.generateVeryfyPart((Point)query);
 		gfVO.add(gfcell);
 		return p;
 	}
@@ -982,47 +1041,7 @@ public class VO implements Serializable {
 			}
 		}
 		if(isParallel()){
-			final boolean[] threadStatus = new boolean[ThreadNum];
-			final int[] lock = new int[1];
-			//final int limit = vos.size();
-			lock[0] = 0;
-			for(int id = 0; id < ThreadNum; id ++){
-				threadStatus[id] = false;
-				final int tid = id;
-				new Thread(new Runnable() {
-					int threadId;
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						threadId = tid;
-						while(true){
-							int curid;
-							synchronized (lock) {
-								curid = lock[0];
-								lock[0] ++;
-							}
-							if(curid >= vos.size())break;
-							vos.get(curid).verify(query);
-						}
-						threadStatus[threadId] = true;
-					}
-				}).start();
-			}
-			while(true){
-				boolean found = false;
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				for(int i = 0; i < ThreadNum; i++){
-					if(threadStatus[i] == false){
-						found = true;
-					}
-				}
-				if(!found)break;
-			}
+			handleVOInParallel(query, 0);
 		}
 		end = bean.getCurrentThreadCpuTime();
 		statForAuth.vrf_time_CL += (end - start) / 1000000.0;
@@ -1236,12 +1255,18 @@ public class VO implements Serializable {
 	}
 	
 	public class dcCell implements cell{
-		public DistanceCompare dc;
+		public DistanceCompare dc = null;
+		public utility.security.Point p1, p2;
 		public dcCell(){}
 		public dcCell(utility.security.Point p1, utility.security.Point p2){
-			dc = new DistanceCompare(p1, p2);
+			//dc = new DistanceCompare(p1, p2);
+			this.p1 = p1;
+			this.p2 = p2;
 		}
 		public void generateVeryfyPart(Point q){
+			if(dc == null){
+				dc = new DistanceCompare(p1, p2);
+			}
 			dc.GenerateVeryfyPart(new utility.security.Point((long)q.getCoord(0), (long)q.getCoord(1), 0));
 		}
 		public boolean verify(Point q){
@@ -1354,5 +1379,6 @@ public class VO implements Serializable {
 	
 	interface cell{
 		public boolean verify(Point query);
+		public void generateVeryfyPart(Point query);
 	}
 }
