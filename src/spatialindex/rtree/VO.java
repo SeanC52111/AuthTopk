@@ -52,7 +52,7 @@ public class VO implements Serializable {
 	 */
 	private String rsaEntaValue;
 	private boolean isParallel = false;
-	private int ThreadNum = 8;
+	private int ThreadNum = 16;
 	private HashMap<Integer, VOCell> nodeVO = new HashMap<Integer, VOCell>();
 	private HashMap<Integer, VOCell> dataVO = new HashMap<Integer, VOCell>();
 	private ArrayList<dcCell> dcVO = new ArrayList<dcCell>();
@@ -925,36 +925,24 @@ public class VO implements Serializable {
 		
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end;
-		final ArrayList<cell> vos = new ArrayList<VO.cell>();
+//		final ArrayList<cell> vos = new ArrayList<VO.cell>();
 		if(type_VO == 0){
 			for(int i = 0; i < dcVO.size(); i++){
-				if(isParallel()){
-					vos.add(dcVO.get(i));
-				}else{
-					if(!dcVO.get(i).verify(query)){
-	//					System.out.println(i + "\t:fail");
-	//					return false;
-					}
+				if(!dcVO.get(i).verify(query)){
+					//					System.out.println(i + "\t:fail");
+					//					return false;
 				}
 			}
 			//System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(isParallel()){
-					vos.add(lineVO.get(i));
-				}else{
-					if(!lineVO.get(i).verify(query)){
+				if(!lineVO.get(i).verify(query)){
 //					return false;
-					}					
-				}
+				}					
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(isParallel()){
-					vos.add(gfVO.get(i));
-				}else{					
-					if(!gfVO.get(i).verify(query)){
+				if(!gfVO.get(i).verify(query)){
 //					return false;
-					}
 				}
 			}
 //			System.out.println("Pass gf!");
@@ -971,22 +959,14 @@ public class VO implements Serializable {
 			ArrayList<String> digests = new ArrayList<String>();
 			for(int i = 0; i < dcVO.size(); i++){
 				//System.out.println(i);
-				if(isParallel()){
-					vos.add(dcVO.get(i));
-				}else{					
-					if(!dcVO.get(i).verify(query)){
+				if(!dcVO.get(i).verify(query)){
 //					return false;
-					}
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(isParallel()){
-					vos.add(lineVO.get(i));
-				}else{
-					if(!lineVO.get(i).verify(query)){
-	//					return false;
-					}
+				if(!lineVO.get(i).verify(query)){
+					//					return false;
 				}
 			}
 //			System.out.println("Pass line!");
@@ -1004,32 +984,20 @@ public class VO implements Serializable {
 			}
 		}else{//kd tree embeded
 			for(int i = 0; i < dcVO.size(); i++){
-				if(isParallel()){
-					vos.add(dcVO.get(i));
-				}else{					
-					if(!dcVO.get(i).verify(query)){
+				if(!dcVO.get(i).verify(query)){
 //					return false;
-					}
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(isParallel()){
-					vos.add(lineVO.get(i));
-				}else{
-					if(!lineVO.get(i).verify(query)){
-	//					return false;
-					}
+				if(!lineVO.get(i).verify(query)){
+					//					return false;
 				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(isParallel()){
-					vos.add(gfVO.get(i));
-				}else{
-					if(!gfVO.get(i).verify(query)){
-	//					return false;
-					}
+				if(!gfVO.get(i).verify(query)){
+					//					return false;
 				}
 			}
 //			System.out.println("Pass gf!");
