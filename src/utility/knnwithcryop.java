@@ -190,8 +190,10 @@ public class knnwithcryop {
 						String[] coords = in.nextLine().split(" ");
 						System.out.println("Please input the limit:");
 						int limit = Integer.parseInt(in.nextLine());
+						System.out.println("Please input whether to use parallel (y/n)");
+						boolean isParallel = in.nextLine().equalsIgnoreCase("y");
 						Point pt = new Point(new double[]{Double.parseDouble(coords[0]), Double.parseDouble(coords[1]), 0});
-						query(kNum, pt, new PrintWriter(System.out), null, -1, limit);				
+						query(kNum, pt, new PrintWriter(System.out), null, -1, limit, isParallel);				
 					}else{
 						System.out.println("===========end query===========");
 						break;
@@ -205,6 +207,8 @@ public class knnwithcryop {
 				String ans_file_name = in.nextLine();
 				System.out.println("Please input the limit:");
 				int limit = Integer.parseInt(in.nextLine());
+				System.out.println("Please input whether to use parallel (y/n)");
+				boolean isParallel = in.nextLine().equalsIgnoreCase("y");
 				StatisticForAuth[] stat = new StatisticForAuth[6];
 				int[] k_of_knn = {1, 2, 4, 8, 16, 32, 64, 128};
 				for(int i = 0; i < 8; i ++){
@@ -223,7 +227,7 @@ public class knnwithcryop {
 						String[] tokens = in1.nextLine().split(" ");
 						Point pt = new Point(new double[]{Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1])});
 						for(int j = 0; j < 6; j++){
-							query(k_of_knn[i], pt, datapw, stat, j, limit);
+							query(k_of_knn[i], pt, datapw, stat, j, limit, isParallel);
 						}
 						if(lines > 50)break;
 					}
@@ -284,13 +288,13 @@ public class knnwithcryop {
 		}
 	}
 	
-	public static void query(int kNum, Point pt, PrintWriter pw, StatisticForAuth[] stat, int type, int limit)throws IOException{
+	public static void query(int kNum, Point pt, PrintWriter pw, StatisticForAuth[] stat, int type, int limit, boolean isParallel)throws IOException{
 		
 		SecurityVisitor svisitor = new SecurityVisitor();
 		VO vo = null;
 		if(type == -1 || type == 0){			
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
-			vo = new VO(kNum, pt, true, myrtree, srtree, 0, svisitor.getDistance(), limit);			
+			vo = new VO(kNum, pt, true, myrtree, srtree, 0, svisitor.getDistance(), limit, isParallel);			
 			if(vo.verify(pt)){
 				System.out.println("Pass!");
 			}else{
@@ -305,7 +309,7 @@ public class knnwithcryop {
 		if(limit > 0 && (type == -1 || type == 1)){	
 			svisitor = new SecurityVisitor();
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
-			vo = new VO(kNum, pt, false, myrtree, srtree, 0, svisitor.getDistance(), limit);
+			vo = new VO(kNum, pt, false, myrtree, srtree, 0, svisitor.getDistance(), limit, isParallel);
 			if(vo.verify(pt)){
 				System.out.println("Pass!");
 			}else{
@@ -322,7 +326,7 @@ public class knnwithcryop {
 			//based on kd tree
 			svisitor = new SecurityVisitor();
 			myrtree_kd.nearestNeighborQuery(kNum, pt, svisitor);
-			vo = new VO(kNum, pt, true, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit);
+			vo = new VO(kNum, pt, true, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit, isParallel);
 			if(vo.verify(pt)){
 				System.out.println("Pass!");
 			}else{
@@ -337,7 +341,7 @@ public class knnwithcryop {
 		if(limit > 0 && (type == -1 || type == 3)){
 			svisitor = new SecurityVisitor();
 			myrtree_kd.nearestNeighborQuery(kNum, pt, svisitor);
-			vo = new VO(kNum, pt, false, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit);
+			vo = new VO(kNum, pt, false, myrtree_kd, srtree_kd, 2, svisitor.getDistance(), limit, isParallel);
 			if(vo.verify(pt)){
 				System.out.println("Pass!");
 			}else{
@@ -354,7 +358,7 @@ public class knnwithcryop {
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
 			e = myrtree.getStatistics().getReads();
 //			System.out.println("io : " + (e - s));
-			vo = new VO(kNum, pt, svisitor.dataState, true, myrtree, limit);
+			vo = new VO(kNum, pt, svisitor.dataState, true, myrtree, limit, isParallel);
 			vo.getStatistics().num_dataio += e - s;
 			if(vo.verify(pt)){
 				System.out.println("Pass!");
@@ -371,7 +375,7 @@ public class knnwithcryop {
 			long s = myrtree.getStatistics().getReads(), e;
 			myrtree.nearestNeighborQuery(kNum, pt, svisitor);
 			e = myrtree.getStatistics().getReads();
-			vo = new VO(kNum, pt, svisitor.dataState, false, myrtree, limit);
+			vo = new VO(kNum, pt, svisitor.dataState, false, myrtree, limit, isParallel);
 			vo.getStatistics().num_dataio += e - s;
 			if(vo.verify(pt)){
 				System.out.println("Pass!");

@@ -51,7 +51,8 @@ public class VO implements Serializable {
 	 * use for counting in analyzing VO String
 	 */
 	private String rsaEntaValue;
-	
+	private boolean isParallel = false;
+	private int ThreadNum = 8;
 	private HashMap<Integer, VOCell> nodeVO = new HashMap<Integer, VOCell>();
 	private HashMap<Integer, VOCell> dataVO = new HashMap<Integer, VOCell>();
 	private ArrayList<dcCell> dcVO = new ArrayList<dcCell>();
@@ -70,11 +71,12 @@ public class VO implements Serializable {
 	/**
 	 * For Voronoi Diagram
 	 * */
-	public VO(int k, final IShape query, HashMap<Integer, Integer> dataState, boolean greedy, RTree _rtree, int _limit){
+	public VO(int k, final IShape query, HashMap<Integer, Integer> dataState, boolean greedy, RTree _rtree, int _limit, boolean isParallel){
 		statForAuth = new StatisticForAuth();
 		rtree = _rtree;
 		type_VO = 1;
 		limit = _limit;
+		setParallel(isParallel);
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end;
 		
@@ -386,13 +388,14 @@ public class VO implements Serializable {
 	}
 	
 	public VO(int k, final IShape query, 
-			boolean greedy, RTree _rtree, SecurityTree _srtree, int type, double kDistance, int _limit){
+			boolean greedy, RTree _rtree, SecurityTree _srtree, int type, double kDistance, int _limit, boolean isParallel){
 		statForAuth = new StatisticForAuth();
 		rtree = _rtree;
 		srtree = _srtree;
 		type_VO = type;
 		states = new ArrayList<StateCell>();
 		limit = _limit;
+		setParallel(isParallel);
 		utility.security.Point sP = new utility.security.Point((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 0); // Note here
 		sP.buildByPaillier();
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
@@ -856,30 +859,43 @@ public class VO implements Serializable {
 		return "";
 	}
 	
-	public boolean verify(Point query){
+	public boolean verify(final Point query){
 		statForAuth.num_PPB += dcVO.size();
 		statForAuth.num_PLB += lineVO.size();
 		statForAuth.num_Gf += gfVO.size();
 		
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		long start = bean.getCurrentThreadCpuTime(), end;
-		if(type_VO == 0){			
+		final ArrayList<cell> vos = new ArrayList<VO.cell>();
+		if(type_VO == 0){
 			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query)){
-//					System.out.println(i + "\t:fail");
-//					return false;
+				if(isParallel()){
+					vos.add(dcVO.get(i));
+				}else{
+					if(!dcVO.get(i).verify(query)){
+	//					System.out.println(i + "\t:fail");
+	//					return false;
+					}
 				}
 			}
 			//System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
+				if(isParallel()){
+					vos.add(lineVO.get(i));
+				}else{
+					if(!lineVO.get(i).verify(query)){
 //					return false;
+					}					
 				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query)){
+				if(isParallel()){
+					vos.add(gfVO.get(i));
+				}else{					
+					if(!gfVO.get(i).verify(query)){
 //					return false;
+					}
 				}
 			}
 //			System.out.println("Pass gf!");
@@ -896,14 +912,22 @@ public class VO implements Serializable {
 			ArrayList<String> digests = new ArrayList<String>();
 			for(int i = 0; i < dcVO.size(); i++){
 				//System.out.println(i);
-				if(!dcVO.get(i).verify(query)){
+				if(isParallel()){
+					vos.add(dcVO.get(i));
+				}else{					
+					if(!dcVO.get(i).verify(query)){
 //					return false;
+					}
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
-//					return false;
+				if(isParallel()){
+					vos.add(lineVO.get(i));
+				}else{
+					if(!lineVO.get(i).verify(query)){
+	//					return false;
+					}
 				}
 			}
 //			System.out.println("Pass line!");
@@ -921,20 +945,32 @@ public class VO implements Serializable {
 			}
 		}else{//kd tree embeded
 			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query)){
+				if(isParallel()){
+					vos.add(dcVO.get(i));
+				}else{					
+					if(!dcVO.get(i).verify(query)){
 //					return false;
+					}
 				}
 			}
 //			System.out.println("Pass dc!");
 			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
-//					return false;
+				if(isParallel()){
+					vos.add(lineVO.get(i));
+				}else{
+					if(!lineVO.get(i).verify(query)){
+	//					return false;
+					}
 				}
 			}
 //			System.out.println("Pass line!");
 			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query)){
-//					return false;
+				if(isParallel()){
+					vos.add(gfVO.get(i));
+				}else{
+					if(!gfVO.get(i).verify(query)){
+	//					return false;
+					}
 				}
 			}
 //			System.out.println("Pass gf!");
@@ -943,6 +979,49 @@ public class VO implements Serializable {
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+		}
+		if(isParallel()){
+			final boolean[] threadStatus = new boolean[ThreadNum];
+			final int[] lock = new int[1];
+			//final int limit = vos.size();
+			lock[0] = 0;
+			for(int id = 0; id < ThreadNum; id ++){
+				threadStatus[id] = false;
+				final int tid = id;
+				new Thread(new Runnable() {
+					int threadId;
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						threadId = tid;
+						while(true){
+							int curid;
+							synchronized (lock) {
+								curid = lock[0];
+								lock[0] ++;
+							}
+							if(curid >= vos.size())break;
+							vos.get(curid).verify(query);
+						}
+						threadStatus[threadId] = true;
+					}
+				}).start();
+			}
+			while(true){
+				boolean found = false;
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				for(int i = 0; i < ThreadNum; i++){
+					if(threadStatus[i] == false){
+						found = true;
+					}
+				}
+				if(!found)break;
 			}
 		}
 		end = bean.getCurrentThreadCpuTime();
@@ -964,11 +1043,26 @@ public class VO implements Serializable {
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		DataInputStream dis = new DataInputStream(bais);
 		int nodeLen = dis.readInt(), dataLen = dis.readInt();
-		
 		dis.close();
 		bais.close();
 	}
 	
+	public boolean isParallel() {
+		return isParallel;
+	}
+
+	public void setParallel(boolean isParallel) {
+		this.isParallel = isParallel;
+	}
+
+	public int getThreadNum() {
+		return ThreadNum;
+	}
+
+	public void setThreadNum(int threadNum) {
+		ThreadNum = threadNum;
+	}
+
 	private class VOCell implements Serializable {
 		/**
 		 * 
@@ -1107,7 +1201,7 @@ public class VO implements Serializable {
 		}
 	}
 	
-	public class lineCell{
+	public class lineCell implements cell{
 		public long id1, id2;
 		public Line line;
 		public String signature;
@@ -1141,7 +1235,7 @@ public class VO implements Serializable {
 		}
 	}
 	
-	public class dcCell{
+	public class dcCell implements cell{
 		public DistanceCompare dc;
 		public dcCell(){}
 		public dcCell(utility.security.Point p1, utility.security.Point p2){
@@ -1165,7 +1259,7 @@ public class VO implements Serializable {
 		}
 	}
 	
-	public class gfCell{
+	public class gfCell implements cell{
 		public Gfunction gf = null, gf2 = null;
 		public String[] ServerReturned, ServerReturned2;
 		public boolean isL, isL2;
@@ -1256,5 +1350,9 @@ public class VO implements Serializable {
 			}
 			return true;
 		}
+	}
+	
+	interface cell{
+		public boolean verify(Point query);
 	}
 }
