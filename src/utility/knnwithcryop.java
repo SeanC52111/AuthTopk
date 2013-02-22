@@ -210,7 +210,8 @@ public class knnwithcryop {
 				System.out.println("Please input whether to use parallel (y/n)");
 				boolean isParallel = in.nextLine().equalsIgnoreCase("y");
 				StatisticForAuth[] stat = new StatisticForAuth[6];
-				int[] k_of_knn = {1, 2, 4, 8, 16, 32, 64, 128};
+				//int[] k_of_knn = {1, 2, 4, 8, 16, 32, 64, 128};
+				int[] k_of_knn = {128, 64, 32, 16, 8, 4, 2, 1};
 				for(int i = 0; i < 8; i ++){
 					System.out.println("k = " + k_of_knn[i]);
 					final PrintWriter datapw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(i).toString() + ".data")));

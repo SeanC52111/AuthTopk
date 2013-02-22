@@ -57,14 +57,14 @@ public class StatisticForAuth {
 	}
 	
 	public void printtoffile(PrintWriter pw){
-		pw.print(pre_time_SP + "\t");
+		//pw.print(pre_time_SP + "\t");
 		pw.print(con_time_SP + "\t");
 		pw.print(vrf_time_CL + "\t");
 		pw.print(size_VO + "\t");
 		pw.print(num_PPB + "\t");
 		pw.print(num_PLB + "\t");
 		pw.print(num_Gf + "\t");
-		pw.print(num_dataio + "\t");
+		pw.print(num_dataio);
 		pw.println("");
 	}
 	

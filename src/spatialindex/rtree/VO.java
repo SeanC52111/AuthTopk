@@ -100,7 +100,9 @@ public class VO implements Serializable {
 								lock[0] ++;
 							}
 							if(curid >= vos.size())break;
-							if(type == 0)vos.get(curid).verify(query);
+							if(type == 0){
+								vos.get(curid).verify(query);
+							}
 							else vos.get(curid).generateVeryfyPart(query);
 						}
 						threadStatus[threadId] = true;
@@ -134,9 +136,9 @@ public class VO implements Serializable {
 		type_VO = 1;
 		limit = _limit;
 		setParallel(isParallel);
-		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-		long start = bean.getCurrentThreadCpuTime(), end;
-		
+		//ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+		//long start = bean.getCurrentThreadCpuTime(), end;
+		long start = System.currentTimeMillis(), end;
 		Integer[] dataList = new Integer[dataState.size()], fDataList = new Integer[dataState.size()];
 		int dataLen = 0, fDataLen = 1;
 		Iterator<Integer> iter = dataState.keySet().iterator();
@@ -403,8 +405,8 @@ public class VO implements Serializable {
 			sigs.add(dataVO.get(fDataList[i]).dataOfPoint.getSignature());
 		}
 		sigWithRSA = SecurityUtility.rsa.getCondensedRSA(sigs.toArray(new String[0]));
-		end = bean.getCurrentThreadCpuTime();
-		statForAuth.con_time_SP += (end - start) / 1000000.0;
+		end = System.currentTimeMillis();
+		statForAuth.con_time_SP += (end - start);
 		statForAuth.size_VO += getVOSize();
 		computeDataIo();
 	}
@@ -456,8 +458,9 @@ public class VO implements Serializable {
 		setParallel(isParallel);
 		utility.security.Point sP = new utility.security.Point((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 0); // Note here
 		sP.buildByPaillier();
-		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-		long start = bean.getCurrentThreadCpuTime(), end;
+//		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+//		long start = bean.getCurrentThreadCpuTime(), end;
+		long start = System.currentTimeMillis(), end;
 		long dios = rtree.getStatistics().getReads(), dioe;
 		if(type == 2){
 			SecurityVisitor svisitor = new SecurityVisitor();
@@ -701,9 +704,10 @@ public class VO implements Serializable {
 			}
 		}
 		if(isParallel())handleVOInParallel((Point)query, 1);
-		end = bean.getCurrentThreadCpuTime();
+//		end = bean.getCurrentThreadCpuTime();
+		end = System.currentTimeMillis();
 		dioe = rtree.getStatistics().getReads();
-		statForAuth.con_time_SP += (end - start) / 1000000.0;
+		statForAuth.con_time_SP += (end - start);
 		statForAuth.size_VO += getVOSize();
 		statForAuth.num_dataio += dioe - dios;
 		computeDataIo();
@@ -923,26 +927,29 @@ public class VO implements Serializable {
 		statForAuth.num_PLB += lineVO.size();
 		statForAuth.num_Gf += gfVO.size();
 		
-		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-		long start = bean.getCurrentThreadCpuTime(), end;
+//		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+//		long start = bean.getCurrentThreadCpuTime(), end;
+		long start = System.currentTimeMillis(), end;
 //		final ArrayList<cell> vos = new ArrayList<VO.cell>();
 		if(type_VO == 0){
-			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query)){
-					//					System.out.println(i + "\t:fail");
-					//					return false;
+			if(!isParallel()){
+				for(int i = 0; i < dcVO.size(); i++){
+					if(!dcVO.get(i).verify(query)){
+						//					System.out.println(i + "\t:fail");
+						//					return false;
+					}
 				}
-			}
-			//System.out.println("Pass dc!");
-			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
+				//System.out.println("Pass dc!");
+				for(int i = 0; i < lineVO.size(); i++){
+					if(!lineVO.get(i).verify(query)){
 //					return false;
-				}					
-			}
+					}					
+				}
 //			System.out.println("Pass line!");
-			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query)){
+				for(int i = 0; i < gfVO.size(); i++){
+					if(!gfVO.get(i).verify(query)){
 //					return false;
+					}
 				}
 			}
 //			System.out.println("Pass gf!");
@@ -957,19 +964,22 @@ public class VO implements Serializable {
 			}
 		}else if(type_VO == 1){// voronoi diagram
 			ArrayList<String> digests = new ArrayList<String>();
-			for(int i = 0; i < dcVO.size(); i++){
-				//System.out.println(i);
-				if(!dcVO.get(i).verify(query)){
+			if(!isParallel()){
+				for(int i = 0; i < dcVO.size(); i++){
+					//System.out.println(i);
+					if(!dcVO.get(i).verify(query)){
 //					return false;
+					}
 				}
-			}
 //			System.out.println("Pass dc!");
-			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
-					//					return false;
+				for(int i = 0; i < lineVO.size(); i++){
+					if(!lineVO.get(i).verify(query)){
+						//					return false;
+					}
 				}
-			}
 //			System.out.println("Pass line!");
+				
+			}
 			
 			Iterator<Integer> iter = dataVO.keySet().iterator();
 			while(iter.hasNext()){
@@ -983,24 +993,27 @@ public class VO implements Serializable {
 				e.printStackTrace();
 			}
 		}else{//kd tree embeded
-			for(int i = 0; i < dcVO.size(); i++){
-				if(!dcVO.get(i).verify(query)){
+			
+			if(!isParallel()){				
+				for(int i = 0; i < dcVO.size(); i++){
+					if(!dcVO.get(i).verify(query)){
 //					return false;
+					}
 				}
-			}
 //			System.out.println("Pass dc!");
-			for(int i = 0; i < lineVO.size(); i++){
-				if(!lineVO.get(i).verify(query)){
-					//					return false;
+				for(int i = 0; i < lineVO.size(); i++){
+					if(!lineVO.get(i).verify(query)){
+						//					return false;
+					}
 				}
-			}
 //			System.out.println("Pass line!");
-			for(int i = 0; i < gfVO.size(); i++){
-				if(!gfVO.get(i).verify(query)){
-					//					return false;
+				for(int i = 0; i < gfVO.size(); i++){
+					if(!gfVO.get(i).verify(query)){
+						//					return false;
+					}
 				}
-			}
 //			System.out.println("Pass gf!");
+			}
 			try {
 				SecurityUtility.deSignWithRSA(srtree.getrsarootentaValue());
 			} catch (UnsupportedEncodingException e) {
@@ -1011,8 +1024,9 @@ public class VO implements Serializable {
 		if(isParallel()){
 			handleVOInParallel(query, 0);
 		}
-		end = bean.getCurrentThreadCpuTime();
-		statForAuth.vrf_time_CL += (end - start) / 1000000.0;
+//		end = bean.getCurrentThreadCpuTime();
+		end = System.currentTimeMillis();
+		statForAuth.vrf_time_CL += (end - start);
 		return true;
 	}
 	
