@@ -11,12 +11,19 @@ public class QueryGenerator {
 		try {
 			PrintWriter pw = new PrintWriter(new FileOutputStream(filename));
 			Random rand = new Random();
-			int times = 100;
+			int times = 49;
 			while(times -- > 0){
-				int x = rand.nextInt((int)FormatData2Norm.scale), y = rand.nextInt((int)1 * FormatData2Norm.scale - x);
+				int x = rand.nextInt((int)FormatData2Norm.scale - 9000) + 9000, y = rand.nextInt((int)1 * FormatData2Norm.scale - x) + 9000;
 				System.out.println(x + " " + y);
 				pw.println(x + " " + y);
 			}
+			times = 50;
+			while(times -- > 0){
+				int x = rand.nextInt((int)FormatData2Norm.scale - 5000) + 5000, y = (int)FormatData2Norm.scale - x;
+				System.out.println(x + " " + y);
+				pw.println(x + " " + y);
+			}
+			pw.println("5000 5000");
 			pw.flush();
 			pw.close();
 		} catch (FileNotFoundException e) {

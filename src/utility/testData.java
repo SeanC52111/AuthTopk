@@ -35,7 +35,7 @@ public class testData extends JFrame {
 	public static final int DEFAULT_LOCATION_X = 150; // default windows initial location x
 	public static final int DEFAULT_LOCATION_Y = 150;//default windows initial location y
 	private String filename = "input/GO0.05.nm";
-	private String fileofquery = "query/query.in";
+	private String fileofquery = "query/query.in.100";
 	/**
 	 * @param args
 	 */
@@ -92,6 +92,9 @@ public class testData extends JFrame {
 					if(y1 < sy) sy = y1;
 				}
 				in.close();
+				sx = sy = 0;
+				mx = my = FormatData2Norm.scale;
+				System.out.println("Read data ended!");
 				in = new Scanner(new FileInputStream(new File(filename)));
 				int rangex = mx - sx, rangey = my - sy;
 				in.nextInt();// eat 3
@@ -107,8 +110,9 @@ public class testData extends JFrame {
 				while(in.hasNext()){
 					int x1 = (int) (1.0 * (in.nextInt() - sx) / rangex * DEFAULT_WIDTH), y1 = (int) (1.0 * (in.nextInt()- sy) / rangey * DEFAULT_HEIGHT);
 					points2.add(new Point(x1, y1));
-					if(count ++ >= 50)break;
+					//if(count ++ >= 50)break;
 				}
+				System.out.println("Read query ended!");
 				in.close();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -121,11 +125,15 @@ public class testData extends JFrame {
 			g.setColor(Color.BLACK);
 			System.out.println(points.size());
 			for(Point p : points){
+				//System.out.println(p.x + ", " + p.y);
 				g.fillRect(p.x, p.y, 5, 5);
 			}
 			g.setColor(Color.RED);
+			Integer count = 0;
 			for(Point p : points2){
-				g.fillPolygon(new int[]{p.x, p.x + 8, p.x + 4}, new int[]{p.y, p.y, p.y - 8}, 3);
+				g.drawString(count.toString(), p.x, p.y);
+				count ++;
+				//g.fillPolygon(new int[]{p.x, p.x + 8, p.x + 4}, new int[]{p.y, p.y, p.y - 8}, 3);
 			}
 			Toolkit.getDefaultToolkit().sync();
 			g.dispose();
