@@ -211,10 +211,10 @@ public class knnwithcryop {
 				boolean isParallel = in.nextLine().equalsIgnoreCase("y");
 				StatisticForAuth[] stat = new StatisticForAuth[6];
 				//int[] k_of_knn = {1, 2, 4, 8, 16, 32, 64, 128};
-				int[] k_of_knn = {128, 64, 32, 16, 8, 4, 2, 1};
+				int[] k_of_knn = {128, 1, 64, 32, 16, 8, 4, 2};
 				for(int i = 0; i < 8; i ++){
 					System.out.println("k = " + k_of_knn[i]);
-					final PrintWriter datapw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(i).toString() + ".data")));
+					final PrintWriter datapw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(k_of_knn[i]).toString() + ".data")));
 					int lines = 0;
 					Scanner in1 = new Scanner(new FileInputStream(new File(filename)));
 					for(int j = 0; j < 6; j++){
@@ -232,7 +232,7 @@ public class knnwithcryop {
 						}
 						if(lines > 50)break;
 					}
-					PrintWriter pw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(i).toString())));
+					PrintWriter pw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(k_of_knn[i]).toString())));
 					for(int j = 0; j < 6; j ++){
 						stat[j].getAveage(lines);
 						stat[j].print();

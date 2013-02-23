@@ -13,7 +13,7 @@ public class QueryGenerator {
 			Random rand = new Random();
 			int times = 49;
 			while(times -- > 0){
-				int x = rand.nextInt((int)FormatData2Norm.scale - 9000) + 9000, y = rand.nextInt((int)1 * FormatData2Norm.scale - x) + 9000;
+				int x = rand.nextInt((int)FormatData2Norm.scale - 7000) + 7000, y = rand.nextInt((int)1 * FormatData2Norm.scale - 7000) + 7000;
 				System.out.println(x + " " + y);
 				pw.println(x + " " + y);
 			}
