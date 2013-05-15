@@ -40,6 +40,24 @@ public class generator {
 		
 	}
 	
+	public static void GeneratePointsofDouble(double sx, double sy, double mx, double my, int num, String filepath){
+		Random ramdom = new Random();
+		double rangex = mx - sx;
+		double rangey = my - sy;
+		try {
+			PrintStream out = new PrintStream(new FileOutputStream(filepath));
+			for(int i = 0; i < num; i++){
+				double x = ramdom.nextDouble() * rangex, y = ramdom.nextDouble() * rangey;
+				out.println((sx + x) + "\t" + (sy + y));
+			}
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void generatorofnear(int num, String filepath){
 		Scanner in;
 		Random ramdom = new Random();
@@ -92,6 +110,7 @@ public class generator {
 //			e.printStackTrace();
 //		}
 //		System.out.println("fin!");
-		generatorofnear(25, "query/query.in.25.v2");
+		//generatorofnear(25, "query/query.in.25.v2");
+		//GeneratePointsofDouble(sx, sy, mx, my, num, filepath);
 	}
 }

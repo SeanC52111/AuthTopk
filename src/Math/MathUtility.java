@@ -3,7 +3,6 @@
  */
 package Math;
 
-import java.math.BigDecimal;
 import java.util.Scanner;
 
 /**
@@ -12,12 +11,23 @@ import java.util.Scanner;
  */
 public class MathUtility {
 
-public static double eps = 1e-8;
+	static double eps = 1e-8;
+	
+	public static double getEps(){
+		return eps;
+	}
+	
+	/**
+	 * set eps, the default is 1e-8;
+	 * */
+	public static void setEps(double _eps){
+		eps = _eps;
+	}
 	
 	/**
 	 * Calculate distance given lat, lng.
 	 * */
-	public static double calculateDist( double startLat, double startLng, double endLat, double endLng ){
+	public static double calculateLatLngDist( double startLat, double startLng, double endLat, double endLng ){
 		/*double pi = atan2(1.0, 1.0) * 4;
 		//scale back to radians
 		double startLatInRadians = startLat*pi/180.0;
@@ -35,7 +45,7 @@ public static double eps = 1e-8;
 	
 		return dist<0 ? -dist : dist;*/
 	
-		double ratio = 0.01745327; // pi/180 
+		double ratio = Math.PI / 180.0; // pi/180 
 		double x = (endLng * ratio - startLng * ratio) * Math.cos((startLat * ratio + endLat * ratio) / 2);
 		double y = (endLat * ratio - startLat * ratio);
 		double circleDist = 6372800.0 * Math.sqrt( x * x + y * y );
@@ -76,6 +86,13 @@ public static double eps = 1e-8;
 			ans += (high[i] - low[i]) * (high[i] - low[i]);
 		}
 		return Math.sqrt(ans);
+	}
+	
+	/**
+	 * get distance of point a, b;
+	 * */
+	public static double getDistance(MathPoint a, MathPoint b){
+		return MathPoint.getDistance(a, b);
 	}
 	
 	/**
@@ -199,6 +216,38 @@ public static double eps = 1e-8;
 		return x;
 	}
 	
+	/**
+	 * Judge a point on a line; 
+	 * */
+	public static boolean isPointOnLine(MathPoint p, MathLine l){
+		return l.isPointOnLine(p);
+	}
+	
+	/**
+	 * Judge a point on a line; 
+	 * */
+	public static boolean isPointOnLine(MathPoint p, MathPoint l1, MathPoint l2){
+		MathLine l = new MathLine(l1, l2);
+		return l.isPointOnLine(p);
+	}
+	
+	
+	/**
+	 * Judge a point on a segment; 
+	 * */
+	public static boolean isPointOnSegment(MathPoint p, MathLine l){
+		return l.isPointOnSegment(p);
+	}
+	
+	
+	/**
+	 * Judge a point on a segment; 
+	 * */
+	public static boolean isPointOnSegment(MathPoint p, MathPoint l1, MathPoint l2){
+		MathLine l = new MathLine(l1, l2);
+		return l.isPointOnSegment(p);
+	}
+	
 	
 	/**
 	 * @param args
@@ -208,7 +257,7 @@ public static double eps = 1e-8;
 		Scanner in = new Scanner(System.in);
 		while(true){
 			double lat1 = in.nextDouble(), lng1 = in.nextDouble(), lat2 = in.nextDouble(), lng2 = in.nextDouble();
-			System.out.println(calculateDist(lat1, lng1, lat2, lng2));
+			System.out.println(calculateLatLngDist(lat1, lng1, lat2, lng2));
 		}
 	}
 

@@ -52,10 +52,6 @@ import java.util.HashMap;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
-import jdbm.RecordManagerFactory;
-
 import spatialindex.core.IData;
 import spatialindex.core.IEntry;
 import spatialindex.core.INearestNeighborComparator;
@@ -76,10 +72,7 @@ import spatialindex.io.RandomEvictionsBuffer;
 import spatialindex.setting.PropertySet;
 import spatialindex.spatialindex.SpatialIndex;
 import utility.Compare.DataOfPoint;
-import utility.Compare.buildBtreeOfPoints;
 import utility.geo.DataOfLine;
-import utility.geo.Line;
-import utility.geo.buildBtreeOfLines;
 import utility.security.DataIO;
 import utility.security.SecurityUtility;
 

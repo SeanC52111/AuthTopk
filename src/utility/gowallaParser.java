@@ -88,7 +88,9 @@ public class gowallaParser {
 //		minx = 30.75629467265251; miny = -117.68412699999999;
 //		maxx = 45.42058094907479; maxy = -66.99663100000009;
 		System.out.println("Coordinates bounds:\t" + minx + ", " + maxx + ", " + miny + ", " + maxy);
-		System.out.println("Distance:\t" + MathUtility.calculateDist(minx, miny, maxx, maxy));
+		System.out.println("Distance:\t" + MathUtility.calculateLatLngDist(minx, miny, maxx, maxy));
+		System.out.println("Distance:\t" + MathUtility.calculateLatLngDist(minx, miny, maxx, miny));
+		System.out.println("Distance:\t" + MathUtility.calculateLatLngDist(minx, miny, minx, maxy));
 		ArrayList<long[]> pointsAfter = new ArrayList<long[]>();
 		PrintWriter pw = new PrintWriter(new File(destFileName + rate + ".nm"));
 		for(int i = 0; i < points.size(); i++){

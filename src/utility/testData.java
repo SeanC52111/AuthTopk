@@ -35,7 +35,7 @@ public class testData extends JFrame {
 	public static final int DEFAULT_LOCATION_X = 150; // default windows initial location x
 	public static final int DEFAULT_LOCATION_Y = 150;//default windows initial location y
 	private String filename = "input/GO0.05.nm";
-	private String fileofquery = "query/query.in.100";
+	private String fileofquery = "query/query.t.in";
 	/**
 	 * @param args
 	 */
@@ -108,9 +108,12 @@ public class testData extends JFrame {
 				in = new Scanner(new FileInputStream(new File(fileofquery)));
 				int count = 0;
 				while(in.hasNext()){
-					int x1 = (int) (1.0 * (in.nextInt() - sx) / rangex * DEFAULT_WIDTH), y1 = (int) (1.0 * (in.nextInt()- sy) / rangey * DEFAULT_HEIGHT);
+					int x = in.nextInt(), y = in.nextInt();
+					int x1 = (int) (1.0 * (x - sx) / rangex * DEFAULT_WIDTH), y1 = (int) (1.0 * (y- sy) / rangey * DEFAULT_HEIGHT);
 					points2.add(new Point(x1, y1));
-					//if(count ++ >= 50)break;
+					count ++;
+					if(count == 22)System.out.println("22: " + x + ", " + y);
+//					if(count ++ >= 50)break;
 				}
 				System.out.println("Read query ended!");
 				in.close();
