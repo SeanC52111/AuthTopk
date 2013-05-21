@@ -82,6 +82,8 @@ public class RTree implements ISpatialIndex {
 	public RandomAccessFile rafLine = null;
 	public HashMap<Long, long[]> tOfPoint = null;
 	public HashMap<Long, long[]> tOfLine = null;
+	public HashMap<Long, DataOfPoint> buffer_Points = new HashMap<Long, DataOfPoint>();
+	public HashMap<Long, DataOfLine> buffer_Lines = new HashMap<Long, DataOfLine>();
 	public String destFileNamePoint, destFileNameLine;
 	IShape queryRegion = null;
 
@@ -401,6 +403,9 @@ public class RTree implements ISpatialIndex {
 	}
 	
 	public DataOfPoint loadDataOfPointFromIndex(long id){
+		if(VO.isSoloAuth){
+			if(buffer_Points.containsKey(id))return buffer_Points.get(id);
+		}
 		if(rafPoint == null || !tOfPoint.containsKey(id)){
 			loadIndexOfPoints();
 		}
@@ -420,11 +425,17 @@ public class RTree implements ISpatialIndex {
 		}
 //		System.out.println("id :\t" + id);
 		DataOfPoint dataOfPoint = new DataOfPoint(data);
+		if(VO.isSoloAuth){
+			buffer_Points.put(id, dataOfPoint);
+		}
 		return dataOfPoint;
 	}
 	
 	public DataOfLine loadDataOfLineFromIndex(long id1, long id2){
 		long id = DataOfLine.calcLineId(id1, id2);
+		if(VO.isSoloAuth){
+			if(buffer_Lines.containsKey(id))return buffer_Lines.get(id);
+		}
 		if(tOfLine == null){
 			loadIndexOfLines();
 		}
@@ -444,11 +455,17 @@ public class RTree implements ISpatialIndex {
 			e.printStackTrace();
 		}
 		DataOfLine dataOfLine = new DataOfLine(data);
+		if(VO.isSoloAuth){
+			buffer_Lines.put(id, dataOfLine);
+		}
 		return dataOfLine;
 	}
 	
 	public DataOfLine loadDataOfLineFromBtree(int id1, int id2){
 		long id = DataOfLine.calcLineId(id1, id2);
+		if(VO.isSoloAuth){
+			if(buffer_Lines.containsKey(id))return buffer_Lines.get(id);
+		}
 		if(tOfLine == null){
 			loadIndexOfLines();
 		}
@@ -468,6 +485,9 @@ public class RTree implements ISpatialIndex {
 			e.printStackTrace();
 		}
 		DataOfLine dataOfLine = new DataOfLine(data);
+		if(VO.isSoloAuth){
+			buffer_Lines.put(id, dataOfLine);
+		}
 		return dataOfLine;
 	}
 	

@@ -130,7 +130,7 @@ public class Paillier {
         //BigInteger r = new BigInteger(bitLength, new Random());
     	//BigInteger r = BigIntegerUtility.PRIME_Q;// I need same value after encryption of same input x @qchen
     	if(m.signum() == -1){
-    		//System.out.println("get it");
+    		System.out.println("get it");
     		m = m.add(GetEulorTotient());
     	}
         return g.modPow(m, nsquare).multiply(r2n).mod(nsquare);

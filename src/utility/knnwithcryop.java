@@ -42,7 +42,7 @@ public class knnwithcryop {
 	public static HashMap<Integer, int[]> nbHashMap = new HashMap<Integer, int[]>();
 //	public static String FileInPath = "input/data.in";
 	public static boolean IS_BATCH_QUERY;
-	
+	public static MemStat memStat = new MemStat();
 	
 	
 	/**
@@ -68,13 +68,15 @@ public class knnwithcryop {
 	}
 	
 	public static void main(String args[]) throws IndexOutOfBoundsException, Exception{
+		new Thread(memStat).start();
+		
 		Scanner in = new Scanner(System.in);
 		
 		//System.out.println("input \"build\" means build a new tree, \"load\" means load from file");
 		//String line = in.nextLine();
 		while(true){
 			String optionLine = "(a) genrate data\n(b) build a tree\n(c) load a tree\n(d) knn query\n" +
-					"(e) batch query\n(f) build indexes of btree\n(g) build voronoi neighbors\n(h) exit.";
+					"(e) batch query\n(f) build indexes of btree\n(g) build voronoi neighbors\n(h) show Mem\n(i) exit.";
 			System.out.println(optionLine);
 			String line = in.nextLine();
 			if(line.equalsIgnoreCase("a")){
@@ -211,7 +213,8 @@ public class knnwithcryop {
 				boolean isParallel = in.nextLine().equalsIgnoreCase("y");
 				StatisticForAuth[] stat = new StatisticForAuth[6];
 				//int[] k_of_knn = {1, 2, 4, 8, 16, 32, 64, 128};
-				int[] k_of_knn = {128, 1, 64, 32, 16, 8, 4, 2};
+//				int[] k_of_knn = {128, 1, 64, 32, 16, 8, 4, 2};
+				int[] k_of_knn = {128, 128, 1, 1, 64, 64, 16, 8, 4, 2};
 				for(int i = 0; i < 8; i ++){
 					System.out.println("k = " + k_of_knn[i]);
 					final PrintWriter datapw = new PrintWriter(new FileOutputStream(new File(ans_file_name + "_" + new Integer(k_of_knn[i]).toString() + ".data")));
@@ -280,6 +283,10 @@ public class knnwithcryop {
 					}
 				}
 			}else if(line.equalsIgnoreCase("h")){
+				memStat.printInfo();
+				memStat.reSet();
+//				System.out.println("Current Memory Usage:\t" + memStat.getCurrentMemSizeInMB());
+			}else if(line.equalsIgnoreCase("i")){
 				System.out.println("exit!");
 				break;
 			}

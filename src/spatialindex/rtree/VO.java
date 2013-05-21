@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import mesh.IntArray;
+
+import Math.MathUtility;
+
 import spatialindex.core.IShape;
 import spatialindex.core.Point;
 import spatialindex.core.Region;
@@ -36,6 +40,7 @@ import utility.security.Hasher;
 import utility.security.SecurityUtility;
 
 /**
+ * note that, if isSoloAuth = true, no privacy is considered. 
  * @author chenqian
  * */
 
@@ -64,6 +69,7 @@ public class VO implements Serializable {
 	private String sigWithRSA;
 	private int type_VO; // 0 means rtree based, 1 means voronoi diagram based, 2 means embeded kdtree rtree based
 	private int limit;
+	public static boolean isSoloAuth = true;
 	private ArrayList<StateCell> states;
 	public VO(){	
 	}
@@ -248,7 +254,7 @@ public class VO implements Serializable {
 				DataOfLine dataofline = null;
 				dataVO.put(pi, new VOCell(false, rtree.loadDataOfPointFromIndex(pi), -1));
 				if(neighborsOfp1.contains(pi)){
-					dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[dataLen - 1])){				
 						lineCell linecell = new lineCell(dataofline);
 						if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -270,7 +276,7 @@ public class VO implements Serializable {
 				boolean found = false;
 				for(int j = 0; j < i; j++){//Dist(j, k) >= Dist(i, k)
 					Integer pj = dataList[j];
-					dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, pj)){						
 						lineCell linecell = new lineCell(dataofline);
 						if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -301,7 +307,7 @@ public class VO implements Serializable {
 				for(int j = 0; j < i; j++){//Dist(j, k) >= Dist(i, k)
 					Integer pj = fDataList[j];
 					DataOfLine dataofline = null;
-					dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, pj);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, pj)){			
 						lineCell linecell = new lineCell(dataofline);
 						if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -334,7 +340,7 @@ public class VO implements Serializable {
 //						utility.security.Point.Distance2((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 
 //						dataVO.get(pi).dataOfPoint.p.x, dataVO.get(pi).dataOfPoint.p.y));
 				if(neighborsOfp1.contains(pi)){
-					dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[dataLen - 1]);
 					if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[dataLen - 1])){				
 						lineCell linecell = new lineCell(dataofline);
 						if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -350,7 +356,7 @@ public class VO implements Serializable {
 					}
 				}
 				if(i == 0)continue;
-				dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
+				if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
 				if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[0])){
 					lineCell linecell = new lineCell(dataofline);
 					if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -375,7 +381,7 @@ public class VO implements Serializable {
 //				System.out.println("far : " + pi + " distance : " + 
 //						utility.security.Point.Distance2((long)((Point)query).getCoord(0), (long)((Point)query).getCoord(1), 
 //						dataVO.get(pi).dataOfPoint.p.x, dataVO.get(pi).dataOfPoint.p.y));
-				dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
+				if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(pi, dataList[0]);
 				if(dataofline != null && computePos(limit, dataVO.get(pi).dataOfPoint, dataList[0])){
 					lineCell linecell = new lineCell(dataofline);
 					if(!isParallel())linecell.generateVeryfyPart((Point)query);
@@ -396,7 +402,9 @@ public class VO implements Serializable {
 				}
 			}
 		}
-		if(isParallel())handleVOInParallel((Point)query, 1);
+		if(isParallel()){
+			if(!isSoloAuth())handleVOInParallel((Point)query, 1);
+		}
 		ArrayList<String> sigs = new ArrayList<String>();
 		for(int i = 0; i < dataLen; i++){
 			sigs.add(dataVO.get(dataList[i]).dataOfPoint.getSignature());
@@ -408,7 +416,7 @@ public class VO implements Serializable {
 		end = System.currentTimeMillis();
 		statForAuth.con_time_SP += (end - start);
 		statForAuth.size_VO += getVOSize();
-		computeDataIo();
+		if(!isSoloAuth())computeDataIo();
 	}
 	
 	/**
@@ -534,7 +542,7 @@ public class VO implements Serializable {
 				for(int j = 0; j < i; j++){//Dist(j, q) >= Dist(i, q)
 					StateCell cellj = dataList[j];
 					DataOfLine dataofline = null;
-					dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellj.getId());
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellj.getId());
 					DataOfPoint dop = null;
 					if(celli.isLeafEntry()){
 						dop = dataVO.get(celli.getId()).dataOfPoint;
@@ -583,7 +591,7 @@ public class VO implements Serializable {
 				for(int j = 0; j < i; j++){//Dist(j, k) >= Dist(i, k)
 					StateCell cellj = fDataList[j];
 					DataOfLine dataofline = null;
-					dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellj.getId());
+					if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellj.getId());
 					DataOfPoint dop = null;
 					if(celli.isLeafEntry()){
 						dop = dataVO.get(celli.getId()).dataOfPoint;
@@ -638,7 +646,7 @@ public class VO implements Serializable {
 					continue;
 				}
 				DataOfLine dataofline = null;
-				dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellk.getId());
+				if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellk.getId());
 				DataOfPoint dop = null;
 				if(celli.isLeafEntry()){
 					dop = dataVO.get(celli.getId()).dataOfPoint;
@@ -677,7 +685,7 @@ public class VO implements Serializable {
 					nodeVO.put(celli.getId(), new VOCell(false, snode.getMbrDigest(), childIdentidiers, node.m_level, computePoint(query, celli.getId(), sP)));
 				}
 				DataOfLine dataofline = null;
-				dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellk.getId());
+				if(!isSoloAuth)dataofline = rtree.loadDataOfLineFromBtree(celli.getId(), cellk.getId());
 				DataOfPoint dop = null;
 				if(celli.isLeafEntry()){
 					dop = dataVO.get(celli.getId()).dataOfPoint;
@@ -703,14 +711,16 @@ public class VO implements Serializable {
 				}
 			}
 		}
-		if(isParallel())handleVOInParallel((Point)query, 1);
+		if(isParallel()){
+			if(!isSoloAuth())handleVOInParallel((Point)query, 1);
+		}
 //		end = bean.getCurrentThreadCpuTime();
 		end = System.currentTimeMillis();
 		dioe = rtree.getStatistics().getReads();
 		statForAuth.con_time_SP += (end - start);
 		statForAuth.size_VO += getVOSize();
 		statForAuth.num_dataio += dioe - dios;
-		computeDataIo();
+		if(!isSoloAuth())computeDataIo();
 	}
 	
 	public utility.security.Point computePoint(IShape query, int key, utility.security.Point sP){
@@ -789,33 +799,45 @@ public class VO implements Serializable {
 		if(type_VO == 0 || type_VO == 2){
 			Iterator<Integer> iter = nodeVO.keySet().iterator();
 			while(iter.hasNext()){
-				ans += nodeVO.get(iter.next()).getVOSize();
+				int key = iter.next();
+				if(!isSoloAuth())ans += nodeVO.get(key).getVOSize();
+				else ans += 160 / 8 + 4 * 4 * 2;
 			}
 			iter = dataVO.keySet().iterator();
 			while(iter.hasNext()){
-				ans += dataVO.get(iter.next()).getVOSize();
+				int key = iter.next();
+				if(!isSoloAuth())ans += dataVO.get(key).getVOSize();
+				else ans += 160 / 8 + 4 * 3;
 			}
 			for(int i = 0; i < dcVO.size(); i++){
-				ans += dcVO.get(i).getVOSize();
+				if(!isSoloAuth())ans += dcVO.get(i).getVOSize();
+				else ans += 4;
 			}
 			for(int i = 0; i < lineVO.size(); i++){
 //				System.out.print(i + "\t");
-				ans += lineVO.get(i).getVOSize();
+				if(!isSoloAuth())ans += lineVO.get(i).getVOSize();
+				else ans += 4;
 			}
 			for(int i = 0; i < gfVO.size(); i++){
-				ans += gfVO.get(i).getVOSize();
+				if(!isSoloAuth())ans += gfVO.get(i).getVOSize();
 			}
+			ans += 256;
 		}else if(type_VO == 1){
 			Iterator<Integer> iter = dataVO.keySet().iterator();
 			while(iter.hasNext()){
-				ans += dataVO.get(iter.next()).getVOSizeBOVD();
+				int key = iter.next();
+				if(!isSoloAuth())ans += dataVO.get(key).getVOSizeBOVD();
+				else ans += 160 / 8 + 4 * 3;
 			}
 			for(int i = 0; i < dcVO.size(); i++){
-				ans += dcVO.get(i).getVOSize();
+				if(!isSoloAuth())ans += dcVO.get(i).getVOSize();
+				else ans += 4;
 			}
 			for(int i = 0; i < lineVO.size(); i++){
-				ans += lineVO.get(i).getVOSize();
+				if(!isSoloAuth())ans += lineVO.get(i).getVOSize();
+				else ans += 4;
 			}
+			ans += 256;
 		}else{
 			System.err.println("No such type!");
 		}
@@ -952,6 +974,24 @@ public class VO implements Serializable {
 					}
 				}
 			}
+			if(isSoloAuth()){
+				for(int i = 0; i < dcVO.size(); i++){
+					dcCell cell = dcVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.p1.x, cell.p1.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.p2.x, cell.p2.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+				for(int i = 0; i < lineVO.size(); i++){
+					lineCell cell = lineVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.line.pL.x, cell.line.pL.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.line.pH.x, cell.line.pH.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+			}
 //			System.out.println("Pass gf!");
 //			String rootDigest = reConstruct(rtree.m_rootID);
 			//System.out.println(rootDigest);System.out.println(srtree.getRootEntaValue());
@@ -980,7 +1020,24 @@ public class VO implements Serializable {
 //			System.out.println("Pass line!");
 				
 			}
-			
+			if(isSoloAuth()){
+				for(int i = 0; i < dcVO.size(); i++){
+					dcCell cell = dcVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.p1.x, cell.p1.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.p2.x, cell.p2.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+				for(int i = 0; i < lineVO.size(); i++){
+					lineCell cell = lineVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.line.pL.x, cell.line.pL.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.line.pH.x, cell.line.pH.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);	
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+			}
 			Iterator<Integer> iter = dataVO.keySet().iterator();
 			while(iter.hasNext()){
 				digests.add(dataVO.get(iter.next()).dataOfPoint.getDigest());
@@ -1014,6 +1071,24 @@ public class VO implements Serializable {
 				}
 //			System.out.println("Pass gf!");
 			}
+			if(isSoloAuth()){
+				for(int i = 0; i < dcVO.size(); i++){
+					dcCell cell = dcVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.p1.x, cell.p1.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.p2.x, cell.p2.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+				for(int i = 0; i < lineVO.size(); i++){
+					lineCell cell = lineVO.get(i);
+					double dist1 = MathUtility.getDistance(cell.line.pL.x, cell.line.pL.y, query.getCoord(0), query.getCoord(1));
+					double dist2 = MathUtility.getDistance(cell.line.pH.x, cell.line.pH.y, query.getCoord(0), query.getCoord(1));
+					if(dist1 < dist2);	
+					Hasher.hashString(new Integer(i).toString());
+					Hasher.hashString(new Integer(i + 1).toString());
+				}
+			}
 			try {
 				SecurityUtility.deSignWithRSA(srtree.getrsarootentaValue());
 			} catch (UnsupportedEncodingException e) {
@@ -1022,7 +1097,7 @@ public class VO implements Serializable {
 			}
 		}
 		if(isParallel()){
-			handleVOInParallel(query, 0);
+			if(!isSoloAuth())handleVOInParallel(query, 0);
 		}
 //		end = bean.getCurrentThreadCpuTime();
 		end = System.currentTimeMillis();
@@ -1050,6 +1125,10 @@ public class VO implements Serializable {
 	
 	public boolean isParallel() {
 		return isParallel;
+	}
+	
+	public boolean isSoloAuth(){
+		return isSoloAuth;
 	}
 
 	public void setParallel(boolean isParallel) {

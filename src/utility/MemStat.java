@@ -3,7 +3,6 @@
  */
 package utility;
 
-
 /**
  * @author chenqian
  *
@@ -44,6 +43,11 @@ public class MemStat implements Runnable{
 		}
 	}
 
+	public void reSet(){
+		max_mem = 0;
+		System.gc();
+	}
+	
 	public long getCurrentMemSize(){
 		return mem_size;
 	}
@@ -58,6 +62,11 @@ public class MemStat implements Runnable{
 	
 	public long getMaxMemSizeInMB(){
 		return max_mem / mb;
+	}
+	
+	public void printInfo(){
+		System.out.println("Current Memory Usage:\t" + getCurrentMemSizeInMB() + " MB");
+		System.out.println("Max Memory Usage:\t" + getMaxMemSizeInMB() + " MB");
 	}
 	
 	public void setFinish(){

@@ -29,7 +29,7 @@ import utility.security.SecurityUtility;
 import utility.security.SeedsGenerater;
 
 public class Line implements IVo{
-	Point pL, pH;
+	public Point pL, pH;
 	BigMathPoint o_pL, o_pH; 
 	Point farL_pL, farL_pH;
 	Point farR_pL, farR_pH;
