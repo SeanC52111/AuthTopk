@@ -1,6 +1,3 @@
-/**
- * 
- */
 package utility;
 
 import java.awt.Point;
@@ -236,15 +233,15 @@ class travesalStrategy implements IQueryStrategy{
 				}
 			}
 		}else{
-			Data[] nds = new Data[node.getChildrenCount()];
+			MRData[] nds = new MRData[node.getChildrenCount()];
 			for(int i = 0; i < nds.length; i++){
-				nds[i] = new Data(node.getChildIdentifier(i), node.getChildShape(i));
+				nds[i] = new MRData(node.getChildIdentifier(i), node.getChildShape(i));
 			}
 			for(int i = 0; i < nds.length; i++){//ll
 				final Point q = new Point((int)nds[i].getShape().getMBR().getLow(0), (int)nds[i].getShape().getMBR().getLow(1));
-				PriorityQueue<Data> priorityQueue = new PriorityQueue<Data>(nds.length, new Comparator<Data>() {
+				PriorityQueue<MRData> priorityQueue = new PriorityQueue<MRData>(nds.length, new Comparator<MRData>() {
 					@Override
-					public int compare(Data o1, Data o2) {
+					public int compare(MRData o1, MRData o2) {
 						// TODO Auto-generated method stub
 						Point p1 = new Point((int)o1.getShape().getMBR().getLow(0), (int)o1.getShape().getMBR().getLow(1));
 						Point p2 = new Point((int)o2.getShape().getMBR().getLow(0), (int)o2.getShape().getMBR().getLow(1));
@@ -262,7 +259,7 @@ class travesalStrategy implements IQueryStrategy{
 				}
 				int sz = limit;
 				while(!priorityQueue.isEmpty() && sz -- > 0){
-					Data top = priorityQueue.poll();
+					MRData top = priorityQueue.poll();
 					long id = calcLineId(nds[i].getIdentifier(), top.getIdentifier(), 0);
 					if(lineHashSet_leaf.contains(id) == false){
 						lineHashSet_leaf.add(id);
@@ -271,9 +268,9 @@ class travesalStrategy implements IQueryStrategy{
 			}
 			for(int i = 0; i < nds.length; i++){//lh
 				final Point q = new Point((int)nds[i].getShape().getMBR().getLow(0), (int)nds[i].getShape().getMBR().getHigh(1));
-				PriorityQueue<Data> priorityQueue = new PriorityQueue<Data>(nds.length, new Comparator<Data>() {
+				PriorityQueue<MRData> priorityQueue = new PriorityQueue<MRData>(nds.length, new Comparator<MRData>() {
 					@Override
-					public int compare(Data o1, Data o2) {
+					public int compare(MRData o1, MRData o2) {
 						// TODO Auto-generated method stub
 						Point p1 = new Point((int)o1.getShape().getMBR().getLow(0), (int)o1.getShape().getMBR().getHigh(1));
 						Point p2 = new Point((int)o2.getShape().getMBR().getLow(0), (int)o2.getShape().getMBR().getHigh(1));
@@ -291,7 +288,7 @@ class travesalStrategy implements IQueryStrategy{
 				}
 				int sz = limit;
 				while(!priorityQueue.isEmpty() && sz -- > 0){
-					Data top = priorityQueue.poll();
+					MRData top = priorityQueue.poll();
 					long id = calcLineId(nds[i].getIdentifier(), top.getIdentifier(), 1);
 					if(lineHashSet_leaf.contains(id) == false){
 						lineHashSet_leaf.add(id);
@@ -300,9 +297,9 @@ class travesalStrategy implements IQueryStrategy{
 			}
 			for(int i = 0; i < nds.length; i++){//hl
 				final Point q = new Point((int)nds[i].getShape().getMBR().getHigh(0), (int)nds[i].getShape().getMBR().getLow(1));
-				PriorityQueue<Data> priorityQueue = new PriorityQueue<Data>(nds.length, new Comparator<Data>() {
+				PriorityQueue<MRData> priorityQueue = new PriorityQueue<MRData>(nds.length, new Comparator<MRData>() {
 					@Override
-					public int compare(Data o1, Data o2) {
+					public int compare(MRData o1, MRData o2) {
 						// TODO Auto-generated method stub
 						Point p1 = new Point((int)o1.getShape().getMBR().getHigh(0), (int)o1.getShape().getMBR().getLow(1));
 						Point p2 = new Point((int)o2.getShape().getMBR().getHigh(0), (int)o2.getShape().getMBR().getLow(1));
@@ -320,7 +317,7 @@ class travesalStrategy implements IQueryStrategy{
 				}
 				int sz = limit;
 				while(!priorityQueue.isEmpty() && sz -- > 0){
-					Data top = priorityQueue.poll();
+					MRData top = priorityQueue.poll();
 					long id = calcLineId(nds[i].getIdentifier(), top.getIdentifier(), 2);
 					if(lineHashSet_leaf.contains(id) == false){
 						lineHashSet_leaf.add(id);
@@ -329,9 +326,9 @@ class travesalStrategy implements IQueryStrategy{
 			}
 			for(int i = 0; i < nds.length; i++){//hh
 				final Point q = new Point((int)nds[i].getShape().getMBR().getHigh(0), (int)nds[i].getShape().getMBR().getHigh(1));
-				PriorityQueue<Data> priorityQueue = new PriorityQueue<Data>(nds.length, new Comparator<Data>() {
+				PriorityQueue<MRData> priorityQueue = new PriorityQueue<MRData>(nds.length, new Comparator<MRData>() {
 					@Override
-					public int compare(Data o1, Data o2) {
+					public int compare(MRData o1, MRData o2) {
 						// TODO Auto-generated method stub
 						Point p1 = new Point((int)o1.getShape().getMBR().getHigh(0), (int)o1.getShape().getMBR().getHigh(1));
 						Point p2 = new Point((int)o2.getShape().getMBR().getHigh(0), (int)o2.getShape().getMBR().getHigh(1));
@@ -349,7 +346,7 @@ class travesalStrategy implements IQueryStrategy{
 				}
 				int sz = limit;
 				while(!priorityQueue.isEmpty() && sz -- > 0){
-					Data top = priorityQueue.poll();
+					MRData top = priorityQueue.poll();
 					long id = calcLineId(nds[i].getIdentifier(), top.getIdentifier(), 3);
 					if(lineHashSet_leaf.contains(id) == false){
 						lineHashSet_leaf.add(id);
@@ -446,11 +443,11 @@ class travesalStrategy_kd implements IQueryStrategy{
 	}
 }
 
-class Data{
+class MRData{
 	int id;
 	IShape shape;
-	public Data(){}
-	public Data(int id, IShape shape) {
+	public MRData(){}
+	public MRData(int id, IShape shape) {
 		super();
 		this.id = id;
 		this.shape = shape;

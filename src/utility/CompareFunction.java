@@ -5,6 +5,7 @@ package utility;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,19 +56,32 @@ public class CompareFunction {
 		for(int i = 0; i < tNL.size(); i ++){
 			hashmap.put(tNL.get(i).id,  i + 1);
 		}
-		for(int i = 0; i < k; i ++){
+		for(int i = 0, j = 0; i < tL.size(); i ++){
 			int id = tL.get(i).id;
 			int pos = hashmap.get(id);
 			if(pos > 100)continue;
+			j ++;
 			if(res < pos){
 				res = pos;
 			}
 			System.out.print(pos + " ");
+			if(j == k)break;
 		}System.out.println();
 		return res;
 //		System.out.println(tL.firstKey());
 //		System.out.println(tNL.firstKey());
 	}
+	
+	static int getPos(double ratio, double[] ratios){
+		System.out.println(ratio);
+		for(int i = 0; i < ratios.length; i ++){
+			if(ratio >= ratios[i] && ratio <= ratios[i + 1]){
+				return i;
+			}
+		}
+		return ratios.length;
+	}
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -101,8 +115,11 @@ public class CompareFunction {
 		lr = new LineNumberReader(new FileReader(file));
 		line = lr.readLine();
 //		double[] ws = {0.01, 0.03, 0.05, 0.08, 0.1, 0.3, 0.5, 0.7, 0.9};
-		double[] ws = {0.01, 0.03, 0.05, 0.08, 0.1, 0.3, 0.5, 0.7, 0.9};
-		double[] ratios = {0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0}; int num = 0;
+//		double[] ws = {0.01, 0.03, 0.05, 0.08, 0.1, 0.3, 0.5, 0.7, 0.9};
+		double[] ws = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+		double[] ratios = {1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, Double.MAX_VALUE}; int num = 0;
+		int res[] = new int[ratios.length];
+		for(int i = 0; i < ratios.length; i ++) res[i] = 0;
 		while (line != null) {
 			String[] tokens = line.split(" "); num ++; System.out.print(".");
 //			int k = Integer.parseInt(tokens[0]);
@@ -111,13 +128,19 @@ public class CompareFunction {
 //			System.out.println("====== k = " + k + " ======" );
 			for(int i = 0; i < ws.length; i ++){
 				int ans = topkQuery(datas, k, x, y, ws[i]);
-				ratios[i] += 100.0 * ans / k;
+//				ratios[i] += 100.0 * ans / k;
+				double ratio = 1.0 * ans / k;
+				res[getPos(ratio, ratios)] ++;
 				//System.out.println("w = " + ws[i] + " ratio = " + 100.0 * ans / k + "%");
 			}
 			line = lr.readLine();
 		}System.out.println();
-		for(int i = 0; i < ws.length; i ++){
-			System.out.println("w = " + ws[i] + " ratio = " + ratios[i] / num + "%");
+		int tot = 0;
+		for(int i = 0; i < ratios.length - 1; i ++){
+			tot += res[i];
+		}
+		for(int i = 0; i < ratios.length - 1; i ++){
+			System.out.println(ratios[i] + " ~ " + ratios[i + 1] + " has " + 100.0 * res[i] / tot);
 		}
 		in.close();
 	}	

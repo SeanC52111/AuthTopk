@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -582,17 +584,18 @@ public class Gfunction {
 		/**
 		 * test for g function
 		 * */
-		long val = 0, x = 1, times = 1000;
-		long start = System.currentTimeMillis(), cputime;
-		Gfunction gf = new Gfunction(val, 16);
+		long val = 20608, x = 20658, times = 1000;
+		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+		long start = bean.getCurrentThreadCpuTime(), cputime;
+		Gfunction gf = new Gfunction(val, 2);
 		String[]  ServerReturned = null;
-		start = System.currentTimeMillis();
+		start = bean.getCurrentThreadCpuTime();
 		for(int i = 0 ; i < times; i ++){
 			ServerReturned = gf.GenerateVeryfyPart(x, false);
 		}
-		cputime = System.currentTimeMillis() - start;
-		System.out.println("Time consume:\t" + cputime);
-		start = System.currentTimeMillis();
+		cputime = bean.getCurrentThreadCpuTime() - start;
+		System.out.println("SP consume:\t" + cputime / times / 1000000.0 + "ms");
+		start = bean.getCurrentThreadCpuTime();
 		for(int i = 0 ; i < times; i ++){
 			if(gf.getDigest().equals(gf.ClientComputed(ServerReturned, gf.U - x)) == true){
 				//System.out.println("Pass verification!");
@@ -601,8 +604,11 @@ public class Gfunction {
 				break;
 			}
 		}
-		x = -1;
-		gf = new Gfunction(val, 16);
+		cputime = bean.getCurrentThreadCpuTime() - start;
+		System.out.println("Client consume:\t" + cputime / times / 1000000.0 + "ms");
+		val = 15169; 
+		x = 15104;
+		gf = new Gfunction(val, 2);
 		ServerReturned = gf.GenerateVeryfyPart(x, true);
 		start = System.currentTimeMillis();
 		for(int i = 0 ; i < times; i ++){
